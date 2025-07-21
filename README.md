@@ -4,7 +4,7 @@ A curated collection of independent web applications and utilities. This reposit
 
 ## 🚀 Live Demo
 
-Visit the live collection at: `https://CJHwong.github.io/browser-toolkit/`
+Visit the live collection at: [https://CJHwong.github.io/browser-toolkit/](https://CJHwong.github.io/browser-toolkit/)
 
 ## 📁 Repository Structure
 
