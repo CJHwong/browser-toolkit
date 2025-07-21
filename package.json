@@ -14,12 +14,10 @@
     "format:check": "prettier --check .",
     "test": "npm run test --workspaces",
     "build": "npm run build --workspaces",
-    "build:production": "npm run build:clean && npm run build:all && npm run build:commit",
+    "build:production": "bash simple-deploy.sh",
     "build:clean": "rm -rf docs",
-    "build:all": "mkdir -p docs && cp index.html docs/ && npm run build --workspaces && npm run build:copy-tools",
-    "build:copy-tools": "cp -r markslide-studio/build docs/markslide-studio",
-    "build:commit": "echo 'Built files ready in docs/ folder. Commit and push to deploy.'",
-    "dev": "npm run start --workspace=markslide-studio"
+    "dev": "npm run start --workspace=markslide-studio",
+    "deploy": "bash simple-deploy.sh && echo 'Ready to commit and push docs/ folder'"
   },
   "homepage": "https://cjhwong.github.io/browser-toolkit",
   "devDependencies": {

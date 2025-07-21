@@ -13,6 +13,9 @@ out/
 
 # Include docs folder for GitHub Pages deployment
 !docs/
+
+# Deployment hash file
+DEPLOY_HASH
 .next/
 .nuxt/
 .vuepress/dist/
