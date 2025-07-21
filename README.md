@@ -1,75 +1,150 @@
-# Browser Toolkit
+# 🧰 Browser Toolkit
 
-A curated collection of independent web applications and utilities. This repository serves as a platform for deploying multiple self-contained web tools that work entirely in the browser without requiring any server infrastructure.
+A curated collection of independent web tools and utilities. All tools work entirely in the browser with hash-based cache-busting for reliable deployments.
 
 ## 🚀 Live Demo
 
-Visit the live collection at: [https://CJHwong.github.io/browser-toolkit/](https://CJHwong.github.io/browser-toolkit/)
+Visit: **[https://cjhwong.github.io/browser-toolkit/](https://cjhwong.github.io/browser-toolkit/)**
+
+## 🎯 Current Tools
+
+### 🎬 MarkSlide Studio
+
+Transform markdown into beautiful RevealJS presentations with auto-animations and speaker notes.
+
+**Features:**
+
+- Live markdown preview
+- Multiple themes and transitions  
+- Auto-animate slide transitions
+- Speaker notes with private view
+- Offline HTML export with full functionality
+- Complete Unicode support (🌍 中文 العربية)
+
+**[Launch MarkSlide Studio →](https://cjhwong.github.io/browser-toolkit/markslide-studio/)**
 
 ## 📁 Repository Structure
 
 ```
-/
-├── index.html             # Main directory listing
-├── README.md              # This file
-├── .gitignore             # Git ignore patterns
-├── tool-name/             # Individual tool directories
-│   ├── index.html         # Tool entry point
-│   ├── assets/            # Tool-specific assets
-│   └── README.md          # Tool documentation
-└── .github/
-    └── workflows/
-        └── deploy.yml     # Automated deployment
+browser-toolkit/
+├── index.html              # Landing page
+├── markslide-studio/       # MarkSlide Studio React app
+├── docs/                   # Deployed files (with cache-busting)
+├── scripts/
+│   ├── build.sh           # Build script with cache-busting
+│   └── deploy.sh          # Full deployment with git
+└── package.json           # Workspace configuration
 ```
+
+## 🔧 Development
+
+### **Quick Start**
+
+```bash
+# Install dependencies
+npm install && npm ci --workspaces
+
+# Start development server
+npm run dev
+
+# Build for production with cache-busting  
+bash scripts/build.sh
+
+# Deploy to GitHub Pages
+bash scripts/deploy.sh
+```
+
+### **Key Features**
+
+- **🔑 Hash-based cache busting** - Users always get latest version
+- **📦 Workspace architecture** - Monorepo with independent tools
+- **⚡ Pre-built deployment** - No build process on GitHub Pages
+- **🛠️ Developer friendly** - One command deployment
 
 ## ➕ Adding New Tools
 
-This repository is designed to be easily extensible. To add a new web tool:
+### **1. Create Your Tool**
 
-### 1. Tool Requirements
+```bash
+# Add to workspace
+mkdir your-tool-name
+cd your-tool-name
 
-Each tool must meet these criteria:
+# Initialize with package.json
+npm init -y
+npm install # your dependencies
 
-- **Self-contained**: No shared dependencies between tools
-- **Client-side only**: Works with static hosting (like GitHub Pages)
-- **Offline capability**: Operates after initial page load
+# Set homepage for relative paths
+echo '"homepage": "./"' >> package.json
+```
 
-### 2. Development Guidelines
+### **2. Update Configuration**
 
-- Create tools using vanilla HTML/CSS/JS or build tools that compile to static files
-- Keep each tool in its own directory with an `index.html` entry point
-- Include a `README.md` for tool-specific documentation
-- Follow web accessibility standards (WCAG guidelines)
-- Optimize for performance and fast loading
+```json
+// In root package.json
+"workspaces": [
+  "markslide-studio",
+  "your-tool-name"
+]
+```
 
-### 3. Integration Process
+### **3. Update Deployment**
 
-1. Create your tool directory and implement the functionality
-2. Add your tool to the main directory listing (`index.html`)
-3. Update build processes if your tool requires compilation
-4. Test locally before submitting
-5. Submit via pull request with clear description
+```bash
+# In scripts/build.sh, add:
+npm run build --workspace=your-tool-name
+cp -r your-tool-name/build docs/your-tool-name
+```
 
-### 4. Supported Technologies
+### **4. Add to Landing Page**
 
-- **Static sites**: HTML, CSS, JavaScript
-- **Modern frameworks**: React, Vue, Svelte (must build to static files)
-- **Build tools**: Webpack, Vite, Parcel (output must be static)
-- **Styling**: CSS, Sass, Tailwind, CSS-in-JS
-- **No server-side**: PHP, Node.js backends, databases not supported
+Add a new tool card to `index.html` following the existing pattern.
 
-## 📦 Deployment
+## 🎯 Tool Requirements
 
-This repository is configured for automatic deployment to GitHub Pages via GitHub Actions.
+### **✅ Must Have**
 
-### Manual Setup
+- **Client-side only**: Works with static hosting
+- **Self-contained**: No shared dependencies between tools  
+- **Offline capable**: Functions after initial load
+- **Cache-friendly**: Works with our hash-based system
 
-1. Go to your repository's Settings → Pages
-2. Set Source to "GitHub Actions"
-3. The workflow will automatically deploy on pushes to `main`
+### **🚫 Not Supported**
 
-### Custom Domain (Optional)
+- Server-side code (PHP, Node.js backends)
+- Databases or persistent storage
+- Real-time communication requiring servers
+- Tools that need npm packages at runtime
 
-1. Add a `CNAME` file with your domain name
-2. Configure DNS with your domain provider
-3. Enable "Enforce HTTPS" in repository settings
+### **✨ Recommended**
+
+- Modern frameworks (React, Vue, Svelte) that build to static files
+- Progressive Web App features
+- Accessibility (WCAG compliance)
+- Mobile-responsive design
+- TypeScript for better development experience
+
+### **How Cache-Busting Works**
+
+1. Each deployment gets unique hash (e.g., `a1b2c3d4`)
+2. Tool URLs become `/markslide-studio/?v=a1b2c3d4`
+3. JavaScript detects hash changes and clears cache
+4. Meta tags prevent browser caching
+
+## 🚀 Deployment
+
+### **Quick Commands**
+
+```bash
+# Build files to docs/ folder
+bash scripts/build.sh
+
+# Build + commit + push to GitHub
+bash scripts/deploy.sh "Your commit message"
+```
+
+### **GitHub Pages Setup**
+
+1. Repository Settings → Pages
+2. Source: "Deploy from a branch"
+3. Branch: `main` / Folder: `/docs`

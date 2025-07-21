@@ -24,11 +24,8 @@ if ! git diff --quiet -- . ':(exclude)docs/'; then
     fi
 fi
 
-echo "🧹 Cleaning previous build..."
-npm run build:clean
-
-echo "🔨 Building all tools..."
-npm run build:all
+echo "🔨 Building with hash-based cache busting..."
+bash scripts/build.sh
 
 echo "📋 Checking build output..."
 if [ ! -d "docs" ]; then
@@ -46,7 +43,13 @@ if [ ! -f "docs/markslide-studio/index.html" ]; then
     exit 1
 fi
 
-echo "✅ Build completed successfully!"
+# Show deployment hash
+if [ -f "DEPLOY_HASH" ]; then
+    HASH=$(cat DEPLOY_HASH)
+    echo "✅ Build completed successfully with hash: $HASH"
+else
+    echo "✅ Build completed successfully!"
+fi
 
 # Add built files to git
 echo "📝 Staging built files..."
