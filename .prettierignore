@@ -1,0 +1,12 @@
+node_modules/
+**/node_modules/
+markslide-studio/build/
+markslide-studio/coverage/
+**/*.min.js
+**/*.min.css
+.git/
+dist/
+build/
+coverage/
+package-lock.json
+**/package-lock.json
