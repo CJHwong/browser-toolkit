@@ -36,11 +36,11 @@ EOF
 
 # Build React applications
 echo "🔨 Building MarkSlide Studio..."
-npm run build --workspace=markslide-studio
+npm run build --workspace=tools/markslide-studio
 
 # Copy built app to docs
 echo "📁 Copying MarkSlide Studio with cache-busting enhancements..."
-cp -r markslide-studio/build docs/markslide-studio
+cp -r tools/markslide-studio/build docs/markslide-studio
 
 # Add cache-busting meta tags and scripts to the React app
 if [ -f "docs/markslide-studio/index.html" ]; then

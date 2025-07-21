@@ -5,7 +5,7 @@
   "private": true,
   "type": "module",
   "workspaces": [
-    "markslide-studio"
+    "tools/markslide-studio"
   ],
   "scripts": {
     "lint": "eslint .",
@@ -16,7 +16,7 @@
     "build": "npm run build --workspaces",
     "build:production": "bash simple-deploy.sh",
     "build:clean": "rm -rf docs",
-    "dev": "npm run start --workspace=markslide-studio",
+    "dev": "npm run start --workspace=tools/markslide-studio",
     "deploy": "bash simple-deploy.sh && echo 'Ready to commit and push docs/ folder'"
   },
   "homepage": "https://cjhwong.github.io/browser-toolkit",

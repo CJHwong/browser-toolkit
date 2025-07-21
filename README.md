@@ -28,7 +28,8 @@ Transform markdown into beautiful RevealJS presentations with auto-animations an
 ```
 browser-toolkit/
 ├── index.html              # Landing page
-├── markslide-studio/       # MarkSlide Studio React app
+├── tools/
+│   └── markslide-studio/   # MarkSlide Studio React app
 ├── docs/                   # Deployed files (with cache-busting)
 ├── scripts/
 │   ├── build.sh           # Build script with cache-busting
@@ -67,8 +68,8 @@ bash scripts/deploy.sh
 
 ```bash
 # Add to workspace
-mkdir your-tool-name
-cd your-tool-name
+mkdir tools/your-tool-name
+cd tools/your-tool-name
 
 # Initialize with package.json
 npm init -y
@@ -83,8 +84,8 @@ echo '"homepage": "./"' >> package.json
 ```json
 // In root package.json
 "workspaces": [
-  "markslide-studio",
-  "your-tool-name"
+  "tools/markslide-studio",
+  "tools/your-tool-name"
 ]
 ```
 
@@ -92,8 +93,8 @@ echo '"homepage": "./"' >> package.json
 
 ```bash
 # In scripts/build.sh, add:
-npm run build --workspace=your-tool-name
-cp -r your-tool-name/build docs/your-tool-name
+npm run build --workspace=tools/your-tool-name
+cp -r tools/your-tool-name/build docs/your-tool-name
 ```
 
 ### **4. Add to Landing Page**
