@@ -6,10 +6,13 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Production builds
-build/
+# Production builds (exclude individual tool builds, but include docs/)
+*/build/
 dist/
 out/
+
+# Include docs folder for GitHub Pages deployment
+!docs/
 .next/
 .nuxt/
 .vuepress/dist/
