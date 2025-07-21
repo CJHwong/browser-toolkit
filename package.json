@@ -14,14 +14,22 @@
     "format:check": "prettier --check .",
     "test": "npm run test --workspaces",
     "build": "npm run build --workspaces",
-    "dev": "npm run start --workspace=markslide-studio"
+    "build:deploy": "npm run build:clean && npm run build:all",
+    "build:clean": "rm -rf dist",
+    "build:all": "mkdir -p dist && cp index.html dist/ && npm run build --workspaces && npm run build:copy-tools",
+    "build:copy-tools": "cp -r markslide-studio/build dist/markslide-studio",
+    "dev": "npm run start --workspace=markslide-studio",
+    "predeploy": "npm run build:deploy",
+    "deploy": "gh-pages -d dist"
   },
+  "homepage": "https://cjhwong.github.io/browser-toolkit",
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^10.0.0",
     "eslint": "^9.18.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "gh-pages": "^6.1.1",
     "prettier": "^3.6.2"
   }
 }
