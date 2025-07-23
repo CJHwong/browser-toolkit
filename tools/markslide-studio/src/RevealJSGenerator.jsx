@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useMemo } from 'react';
+import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import { markslideThemeCSS } from './theme/markslide.js';
 import { zenburnLightCSS } from './theme/zenburn-light.js';
 
@@ -426,7 +426,7 @@ ${verticalSections}
 
 // Component subcomponents
 const ThemeSelector = ({ value, onChange }) => (
-  <div>
+  <div className="min-w-[120px]">
     <label className="text-sm font-medium text-text-secondary">Theme</label>
     <select
       value={value}
@@ -444,7 +444,7 @@ const ThemeSelector = ({ value, onChange }) => (
 );
 
 const TransitionSelector = ({ value, onChange }) => (
-  <div>
+  <div className="min-w-[120px]">
     <label className="text-sm font-medium text-text-secondary">
       Transition
     </label>
@@ -464,7 +464,20 @@ const TransitionSelector = ({ value, onChange }) => (
 );
 
 const ProTipsSection = () => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(() => {
+    // Default to expanded when screen is wide enough (lg breakpoint: 1024px)
+    return window.innerWidth >= 1024;
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      const isWideScreen = window.innerWidth >= 1024;
+      setIsExpanded(isWideScreen);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <div className="mt-2 p-3 bg-surface border border-border rounded-md">
@@ -504,11 +517,31 @@ const ProTipsSection = () => {
                 <kbd className="px-1.5 py-0.5 font-sans rounded bg-border text-text-primary">
                   S
                 </kbd>{' '}
-                for speaker view
+                for speaker view (in downloaded HTML)
+              </span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-0.5">•</span>
+              <span>
+                Press{' '}
+                <kbd className="px-1.5 py-0.5 font-sans rounded bg-border text-text-primary">
+                  F
+                </kbd>{' '}
+                for fullscreen mode
               </span>
             </li>
           </ul>
           <ul className="space-y-2 text-xs text-text-secondary">
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-0.5">•</span>
+              <span>
+                Press{' '}
+                <kbd className="px-1.5 py-0.5 font-sans rounded bg-border text-text-primary">
+                  ESC
+                </kbd>{' '}
+                for overview mode
+              </span>
+            </li>
             <li className="flex items-start gap-2">
               <span className="text-primary mt-0.5">•</span>
               <span>
@@ -563,47 +596,50 @@ const DocumentationSection = () => {
 
   return (
     <div className="mt-4 p-3 bg-surface border border-border rounded-md">
-      <div className="flex items-center justify-between">
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="flex-grow flex items-center justify-between text-sm font-semibold text-text-primary"
-        >
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="w-full flex items-center justify-between text-sm font-semibold text-text-primary"
+      >
+        <div className="flex items-center gap-3">
           <span>Full Documentation</span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className={`h-5 w-5 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-            viewBox="0 0 20 20"
-            fill="currentColor"
+          <button
+            onClick={e => {
+              e.stopPropagation();
+              copyAIDocumentation();
+            }}
+            className="px-3 py-1 bg-primary/10 text-primary rounded-md hover:bg-primary/20 text-xs font-semibold transition-colors flex items-center gap-2 flex-shrink-0"
+            title="Copy documentation in AI-friendly format"
           >
-            <path
-              fillRule="evenodd"
-              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </button>
-        <button
-          onClick={copyAIDocumentation}
-          className="ml-4 px-3 py-1 bg-primary/10 text-primary rounded-md hover:bg-primary/20 text-xs font-semibold transition-colors flex items-center gap-2 flex-shrink-0"
-          title="Copy documentation in AI-friendly format"
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m-6 4h6m-6 4h6m-6 4h6"
+              />
+            </svg>
+            <span>Copy for AI</span>
+          </button>
+        </div>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className={`h-5 w-5 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+          viewBox="0 0 20 20"
+          fill="currentColor"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m-6 4h6m-6 4h6m-6 4h6"
-            />
-          </svg>
-          <span>Copy for AI</span>
-        </button>
-      </div>
+          <path
+            fillRule="evenodd"
+            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+            clipRule="evenodd"
+          />
+        </svg>
+      </button>
 
       {isExpanded && (
         <div className="mt-4 space-y-4 text-xs text-text-secondary">
