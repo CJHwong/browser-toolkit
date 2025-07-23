@@ -75,9 +75,59 @@ for tool_dir in tools/*/; do
     fi
 done
 
+# Add cache-busting to the main docs/index.html
+echo "🔑 Adding cache-busting to main index.html..."
+if [ -f "docs/index.html" ]; then
+    # Create backup
+    cp "docs/index.html" "docs/index.html.backup"
+    
+    # Add cache-busting meta tags after <head>
+    sed -i '' 's|<head>|<head>\
+  <meta name="deployment-hash" content="'$HASH'">\
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">\
+  <meta http-equiv="Pragma" content="no-cache">\
+  <meta http-equiv="Expires" content="0">|' "docs/index.html"
+    
+    # Add cache-busting script before </head>
+    sed -i '' 's|</head>|\
+  <script>\
+    // Cache busting for deployment '$HASH'\
+    (function() {\
+      const deployHash = "'$HASH'";\
+      console.log("🚀 Main Index - Deployment:", deployHash);\
+      \
+      window.DEPLOYMENT_INFO = {\
+        hash: deployHash,\
+        buildTime: "'$BUILD_TIME'",\
+        tool: "main"\
+      };\
+      \
+      const lastDeployHash = localStorage.getItem("lastDeployHash_main");\
+      if (lastDeployHash && lastDeployHash !== deployHash) {\
+        console.log("🔄 New deployment detected for main index, clearing cache...");\
+        if ("caches" in window) {\
+          caches.keys().then(names => {\
+            names.forEach(name => caches.delete(name));\
+          });\
+        }\
+      }\
+      localStorage.setItem("lastDeployHash_main", deployHash);\
+    })();\
+  </script>\
+</head>|' "docs/index.html"
+    
+    # Clean up backup
+    rm "docs/index.html.backup"
+    
+    echo "   ✅ Enhanced main index.html with cache-busting"
+else
+    echo "   ⚠️ Warning: docs/index.html not found for enhancement."
+fi
+
 # Add cache-busting enhancements to tools with index.html
-echo "🔑 Adding cache-busting enhancements..."
+echo "🔑 Adding cache-busting enhancements to tools..."
 for tool_dir in docs/*/; do
+
     if [ -d "$tool_dir" ] && [ -f "$tool_dir/index.html" ]; then
         tool_name=$(basename "$tool_dir")
         # Create backup
