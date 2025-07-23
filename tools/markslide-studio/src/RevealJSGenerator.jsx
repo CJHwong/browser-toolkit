@@ -573,6 +573,246 @@ const ProTipsSection = () => {
   );
 };
 
+const ExportDropdown = ({
+  onDownloadHTML,
+  onExportPDF,
+  isDownloading,
+  isOpen,
+  onToggle,
+  activeSubMenu,
+  onSubMenuChange,
+}) => {
+  const [selectedHTMLNotes, setSelectedHTMLNotes] = useState('false');
+  const [selectedPDFNotes, setSelectedPDFNotes] = useState('false');
+  const [subMenuPosition, setSubMenuPosition] = useState('right');
+
+  // Recalculate position on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (activeSubMenu) {
+        const dropdown = document.querySelector('.export-dropdown');
+        if (dropdown) {
+          const dropdownRect = dropdown.getBoundingClientRect();
+          const windowWidth = window.innerWidth;
+          const subMenuWidth = 320; // w-80 = 320px
+          const spacingBuffer = 16; // ml-1 + some extra space
+
+          const wouldOverflow =
+            dropdownRect.right + subMenuWidth + spacingBuffer > windowWidth;
+          setSubMenuPosition(wouldOverflow ? 'left' : 'right');
+        }
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [activeSubMenu]);
+
+  const speakerNotesOptions = [
+    { value: 'false', label: 'No Notes' },
+    { value: 'true', label: 'Overlay' },
+    { value: 'separate-page', label: 'Separate Pages' },
+  ];
+
+  const handleExportClick = (type, notesValue) => {
+    if (type === 'html') {
+      onDownloadHTML(notesValue);
+    } else if (type === 'pdf') {
+      onExportPDF(notesValue);
+    }
+    // Close dropdown after selection
+    onToggle();
+    onSubMenuChange(null);
+  };
+
+  const handleSubMenuClick = type => {
+    // Calculate if there's enough space on the right for the sub-menu
+    const dropdown = document.querySelector('.export-dropdown');
+    if (dropdown) {
+      const dropdownRect = dropdown.getBoundingClientRect();
+      const windowWidth = window.innerWidth;
+      const subMenuWidth = 320; // w-80 = 320px
+      const spacingBuffer = 16; // ml-1 + some extra space
+
+      // Check if sub-menu would overflow on the right
+      const wouldOverflow =
+        dropdownRect.right + subMenuWidth + spacingBuffer > windowWidth;
+      setSubMenuPosition(wouldOverflow ? 'left' : 'right');
+    }
+
+    onSubMenuChange(activeSubMenu === type ? null : type);
+  };
+
+  return (
+    <div className="relative min-w-[120px] export-dropdown">
+      <label className="text-sm font-medium text-transparent select-none">
+        Export
+      </label>
+      <button
+        onClick={onToggle}
+        disabled={isDownloading}
+        className="mt-1 w-full px-4 py-2 bg-surface border border-border text-text-primary rounded-md hover:bg-background disabled:opacity-50 text-sm font-semibold transition-colors flex items-center justify-center gap-2"
+        aria-label="Export presentation"
+      >
+        {isDownloading ? (
+          <>
+            <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
+            <span>Exporting...</span>
+          </>
+        ) : (
+          <>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+              />
+            </svg>
+            <span>Export</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </>
+        )}
+      </button>
+
+      {isOpen && (
+        <div className="absolute top-full left-0 mt-1 w-48 bg-surface border border-border rounded-md shadow-lg z-50">
+          {/* Download HTML */}
+          <div className="relative">
+            <button
+              onClick={() => handleSubMenuClick('html')}
+              className="w-full px-4 py-3 text-left hover:bg-background transition-colors flex items-center justify-between text-sm text-text-primary"
+            >
+              <div className="flex items-center gap-2">
+                <span>📄</span>
+                <span>Download HTML</span>
+              </div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+
+            {activeSubMenu === 'html' && (
+              <div
+                className={`absolute top-0 w-80 bg-surface border border-border rounded-md shadow-lg ${
+                  subMenuPosition === 'right'
+                    ? 'left-full ml-1'
+                    : 'right-full mr-1'
+                }`}
+              >
+                <div className="p-3">
+                  <div className="flex gap-2">
+                    {speakerNotesOptions.map(option => (
+                      <button
+                        key={option.value}
+                        onClick={() => handleExportClick('html', option.value)}
+                        className={`px-3 py-2 rounded text-xs font-medium transition-colors ${
+                          selectedHTMLNotes === option.value
+                            ? 'bg-primary text-white'
+                            : 'bg-background text-text-primary hover:bg-border'
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="border-t border-border"></div>
+
+          {/* Export PDF */}
+          <div className="relative">
+            <button
+              onClick={() => handleSubMenuClick('pdf')}
+              className="w-full px-4 py-3 text-left hover:bg-background transition-colors flex items-center justify-between text-sm text-text-primary"
+            >
+              <div className="flex items-center gap-2">
+                <span>📊</span>
+                <span>Export PDF</span>
+              </div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+
+            {activeSubMenu === 'pdf' && (
+              <div
+                className={`absolute top-0 w-80 bg-surface border border-border rounded-md shadow-lg ${
+                  subMenuPosition === 'right'
+                    ? 'left-full ml-1'
+                    : 'right-full mr-1'
+                }`}
+              >
+                <div className="p-3">
+                  <div className="flex gap-2">
+                    {speakerNotesOptions.map(option => (
+                      <button
+                        key={option.value}
+                        onClick={() => handleExportClick('pdf', option.value)}
+                        className={`px-3 py-2 rounded text-xs font-medium transition-colors ${
+                          selectedPDFNotes === option.value
+                            ? 'bg-primary text-white'
+                            : 'bg-background text-text-primary hover:bg-border'
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const DocumentationSection = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const copyAIDocumentation = () => {
@@ -808,137 +1048,76 @@ const RevealJSGenerator = () => {
   const [selectedTheme, setSelectedTheme] = useState('markslide');
   const [selectedTransition, setSelectedTransition] = useState('slide');
   const [isDownloading, setIsDownloading] = useState(false);
+  const [exportDropdownOpen, setExportDropdownOpen] = useState(false);
+  const [activeSubMenu, setActiveSubMenu] = useState(null); // 'html' | 'pdf' | null
 
   const previewIframeRef = useRef(null);
 
-  // Memoized presentation HTML to prevent unnecessary recalculation
-  const presentationHTML = useMemo(() => {
-    const slidesHtml = convertMarkdownToSlides(markdownInput);
-    const themeMarkup =
-      selectedTheme === 'markslide'
-        ? `<style>${markslideThemeCSS}</style>`
-        : `<link rel="stylesheet" href="${CDN_BASE_URL}/theme/${selectedTheme}.min.css">`;
-
-    const highlightThemeMarkup =
-      selectedTheme === 'markslide'
-        ? `<style>${zenburnLightCSS}</style>`
-        : `<link rel="stylesheet" href="${CDN_BASE_URL}/plugin/highlight/zenburn.min.css">`;
-
-    return `<!DOCTYPE html>
-<html>
-<head>
-    <link rel="stylesheet" href="${CDN_BASE_URL}/reveal.min.css">
-    ${themeMarkup}
-    ${highlightThemeMarkup}
-    <style>
-        .reveal pre code {
-            max-height: 600px; /* Increased max-height for better viewing */
-            width: 100%;
-            display: block;
-            overflow-x: auto;
-        }
-        .reveal pre {
-            width: 100%;
-            margin: 0 auto;
-            font-size: 0.55em;
-        }
-        .reveal code {
-            max-height: none;
-            white-space: pre;
-        }
-    </style>
-</head>
-<body>
-    <div class="reveal">
-        <div class="slides">
-            ${slidesHtml}
-        </div>
-    </div>
-
-    <script src="${CDN_BASE_URL}/reveal.min.js"></script>
-    <script src="${CDN_BASE_URL}/plugin/highlight/highlight.min.js"></script>
-    <script src="${CDN_BASE_URL}/plugin/notes/notes.min.js"></script>
-    
-    <script>
-        Reveal.initialize({
-            transition: '${selectedTransition}',
-            plugins: [RevealHighlight, RevealNotes]
-        });
-        
-        // Disable speaker view in preview mode
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 's' || e.key === 'S') {
-                e.preventDefault();
-                // You can optionally show a custom message here
-            }
-        });
-    </script>
-</body>
-</html>`;
-  }, [markdownInput, selectedTheme, selectedTransition]);
-
-  // Memoized CDN URLs to prevent recalculation
-  const cdnUrls = useMemo(
-    () => ({
-      revealCSS: `${CDN_BASE_URL}/reveal.min.css`,
-      themeCSS: `${CDN_BASE_URL}/theme/${selectedTheme}.min.css`,
-      highlightCSS: `${CDN_BASE_URL}/plugin/highlight/zenburn.min.css`,
-      revealJS: `${CDN_BASE_URL}/reveal.min.js`,
-      highlightJS: `${CDN_BASE_URL}/plugin/highlight/highlight.min.js`,
-      notesJS: `${CDN_BASE_URL}/plugin/notes/notes.min.js`,
-    }),
-    [selectedTheme]
-  );
-
-  const handleMarkdownChange = useCallback(event => {
-    setMarkdownInput(event.target.value);
-  }, []);
-
-  const downloadOfflinePresentation = useCallback(async () => {
-    if (isDownloading) return;
-
-    setIsDownloading(true);
-
-    try {
-      const [revealCSS, revealJS, highlightJS, notesJS] = await Promise.all([
-        fetch(cdnUrls.revealCSS).then(r => r.text()),
-        fetch(cdnUrls.revealJS).then(r => r.text()),
-        fetch(cdnUrls.highlightJS).then(r => r.text()),
-        fetch(cdnUrls.notesJS).then(r => r.text()),
-      ]);
-
-      const themeCSS =
-        selectedTheme === 'markslide'
-          ? markslideThemeCSS
-          : await fetch(cdnUrls.themeCSS).then(r => r.text());
-
-      const highlightCSS =
-        selectedTheme === 'markslide'
-          ? zenburnLightCSS
-          : await fetch(cdnUrls.highlightCSS).then(r => r.text());
+  // Shared template function to ensure consistency
+  const createPresentationHTML = useCallback(
+    (options = {}) => {
+      const {
+        useEmbeddedAssets = false,
+        enablePrintPDF = false,
+        showNotes = 'false',
+        revealCSS = '',
+        revealJS = '',
+        highlightJS = '',
+        notesJS = '',
+        themeCSS = '',
+        highlightCSS = '',
+        title = 'Presentation',
+      } = options;
 
       const slidesHtml = convertMarkdownToSlides(markdownInput);
-      const filename = extractTitleFromMarkdown(markdownInput);
 
-      const embeddedHTML = `<!DOCTYPE html>
+      // Theme markup - either embedded CSS or CDN link
+      const themeMarkup = useEmbeddedAssets
+        ? `<style>\n${themeCSS || (selectedTheme === 'markslide' ? markslideThemeCSS : '')}\n</style>`
+        : selectedTheme === 'markslide'
+          ? `<style>${markslideThemeCSS}</style>`
+          : `<link rel="stylesheet" href="${CDN_BASE_URL}/theme/${selectedTheme}.min.css">`;
+
+      // Highlight markup - either embedded CSS or CDN link
+      const highlightThemeMarkup = useEmbeddedAssets
+        ? `<style>\n${highlightCSS || (selectedTheme === 'markslide' ? zenburnLightCSS : '')}\n</style>`
+        : selectedTheme === 'markslide'
+          ? `<style>${zenburnLightCSS}</style>`
+          : `<link rel="stylesheet" href="${CDN_BASE_URL}/plugin/highlight/zenburn.min.css">`;
+
+      // CSS markup - either embedded or CDN link
+      const cssMarkup = useEmbeddedAssets
+        ? `<style>\n${revealCSS}\n</style>`
+        : `<link rel="stylesheet" href="${CDN_BASE_URL}/reveal.min.css">`;
+
+      // JavaScript markup - either embedded or CDN links
+      const jsMarkup = useEmbeddedAssets
+        ? `
+    <script>
+${revealJS}
+    </script>
+    
+    <script>
+${highlightJS}
+    </script>
+    
+    <script>
+${notesJS}
+    </script>`
+        : `
+    <script src="${CDN_BASE_URL}/reveal.min.js"></script>
+    <script src="${CDN_BASE_URL}/plugin/highlight/highlight.min.js"></script>
+    <script src="${CDN_BASE_URL}/plugin/notes/notes.min.js"></script>`;
+
+      return `<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Presentation</title>
-    
-    <style>
-${revealCSS}
-    </style>
-    
-    <style>
-${themeCSS}
-    </style>
-    
-    <style>
-${highlightCSS}
-    </style>
-    
+    <title>${title}</title>
+    ${cssMarkup}
+    ${themeMarkup}
+    ${highlightThemeMarkup}
     <style>
         .reveal pre code {
             max-height: 600px;
@@ -964,47 +1143,231 @@ ${highlightCSS}
         </div>
     </div>
 
-    <script>
-${revealJS}
-    </script>
+    ${jsMarkup}
     
     <script>
-${highlightJS}
-    </script>
-    
-    <script>
-${notesJS}
-    </script>
-    
-    <script>
+        ${
+          enablePrintPDF
+            ? `
+        // Check for print-pdf query parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const isPrintPDF = urlParams.has('print-pdf');
+        
+        Reveal.initialize({
+            view: 'print',
+            transition: '${selectedTransition}',
+            plugins: [RevealHighlight, RevealNotes],
+            showNotes: ${showNotes === 'separate-page' ? `'separate-page'` : showNotes},
+            pdfMaxPagesPerSlide: 1,
+            pdfSeparateFragments: true
+        });
+        
+        // Auto-trigger print dialog if in PDF mode
+        if (isPrintPDF) {
+            setTimeout(() => {
+                window.print();
+            }, 1000);
+        }`
+            : `
         Reveal.initialize({
             transition: '${selectedTransition}',
-            plugins: [RevealHighlight, RevealNotes]
+            plugins: [RevealHighlight, RevealNotes],
+            showNotes: ${showNotes === 'separate-page' ? `'separate-page'` : showNotes}
         });
+        
+        // Disable speaker view in preview mode (unless showNotes is enabled)
+        ${
+          showNotes === 'false'
+            ? `
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 's' || e.key === 'S') {
+                e.preventDefault();
+                // You can optionally show a custom message here
+            }
+        });`
+            : ''
+        }
+        `
+        }
     </script>
 </body>
 </html>`;
+    },
+    [markdownInput, selectedTheme, selectedTransition]
+  );
 
-      const blob = new Blob([embeddedHTML], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
-      const downloadLink = document.createElement('a');
-      downloadLink.href = url;
-      downloadLink.download = `${filename}.html`;
-      downloadLink.click();
-      URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error downloading presentation:', error);
-      alert('Error creating offline presentation. Please try again.');
-    } finally {
-      setIsDownloading(false);
-    }
-  }, [
-    markdownInput,
-    selectedTheme,
-    selectedTransition,
-    cdnUrls,
-    isDownloading,
-  ]);
+  // Memoized presentation HTML for preview
+  const presentationHTML = useMemo(() => {
+    return createPresentationHTML();
+  }, [createPresentationHTML]);
+
+  // Memoized CDN URLs to prevent recalculation
+  const cdnUrls = useMemo(
+    () => ({
+      revealCSS: `${CDN_BASE_URL}/reveal.min.css`,
+      themeCSS: `${CDN_BASE_URL}/theme/${selectedTheme}.min.css`,
+      highlightCSS: `${CDN_BASE_URL}/plugin/highlight/zenburn.min.css`,
+      revealJS: `${CDN_BASE_URL}/reveal.min.js`,
+      highlightJS: `${CDN_BASE_URL}/plugin/highlight/highlight.min.js`,
+      notesJS: `${CDN_BASE_URL}/plugin/notes/notes.min.js`,
+    }),
+    [selectedTheme]
+  );
+
+  const handleMarkdownChange = useCallback(event => {
+    setMarkdownInput(event.target.value);
+  }, []);
+
+  const exportToPDF = useCallback(
+    async (showNotes = 'false') => {
+      if (isDownloading) return;
+
+      setIsDownloading(true);
+
+      try {
+        const [revealCSS, revealJS, highlightJS, notesJS] = await Promise.all([
+          fetch(cdnUrls.revealCSS).then(r => r.text()),
+          fetch(cdnUrls.revealJS).then(r => r.text()),
+          fetch(cdnUrls.highlightJS).then(r => r.text()),
+          fetch(cdnUrls.notesJS).then(r => r.text()),
+        ]);
+
+        const themeCSS =
+          selectedTheme === 'markslide'
+            ? markslideThemeCSS
+            : await fetch(cdnUrls.themeCSS).then(r => r.text());
+
+        const highlightCSS =
+          selectedTheme === 'markslide'
+            ? zenburnLightCSS
+            : await fetch(cdnUrls.highlightCSS).then(r => r.text());
+
+        // Create embedded HTML using the shared template
+        const embeddedHTML = createPresentationHTML({
+          useEmbeddedAssets: true,
+          enablePrintPDF: true,
+          showNotes,
+          revealCSS,
+          revealJS,
+          highlightJS,
+          notesJS,
+          themeCSS,
+          highlightCSS,
+          title: 'Presentation - PDF Export',
+        });
+        // Wait a moment, then open the PDF-ready version in a new tab
+        setTimeout(() => {
+          // Create PDF-optimized HTML with print-pdf mode enabled
+          const pdfOptimizedHTML = embeddedHTML.replace(
+            "const isPrintPDF = urlParams.has('print-pdf');",
+            'const isPrintPDF = true; // Force PDF mode'
+          );
+
+          const newWindow = window.open('', '_blank');
+          if (newWindow) {
+            newWindow.document.write(pdfOptimizedHTML);
+            newWindow.document.close();
+          } else {
+            alert(
+              'Please allow popups and check your downloads folder for the PDF-ready HTML file.'
+            );
+          }
+        }, 1000);
+      } catch (error) {
+        console.error('Error creating PDF export:', error);
+        alert('Error creating PDF export. Please try again.');
+      } finally {
+        setIsDownloading(false);
+      }
+    },
+    [createPresentationHTML, markdownInput, cdnUrls, isDownloading]
+  );
+
+  const downloadOfflinePresentation = useCallback(
+    async (showNotes = 'false') => {
+      if (isDownloading) return;
+
+      setIsDownloading(true);
+
+      try {
+        const [revealCSS, revealJS, highlightJS, notesJS] = await Promise.all([
+          fetch(cdnUrls.revealCSS).then(r => r.text()),
+          fetch(cdnUrls.revealJS).then(r => r.text()),
+          fetch(cdnUrls.highlightJS).then(r => r.text()),
+          fetch(cdnUrls.notesJS).then(r => r.text()),
+        ]);
+
+        const themeCSS =
+          selectedTheme === 'markslide'
+            ? markslideThemeCSS
+            : await fetch(cdnUrls.themeCSS).then(r => r.text());
+
+        const highlightCSS =
+          selectedTheme === 'markslide'
+            ? zenburnLightCSS
+            : await fetch(cdnUrls.highlightCSS).then(r => r.text());
+
+        const filename = extractTitleFromMarkdown(markdownInput);
+
+        // Create embedded HTML using the shared template
+        const embeddedHTML = createPresentationHTML({
+          useEmbeddedAssets: true,
+          enablePrintPDF: false,
+          showNotes,
+          revealCSS,
+          revealJS,
+          highlightJS,
+          notesJS,
+          themeCSS,
+          highlightCSS,
+          title: 'Presentation',
+        });
+
+        const blob = new Blob([embeddedHTML], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const downloadLink = document.createElement('a');
+        downloadLink.href = url;
+        downloadLink.download = `${filename}.html`;
+        downloadLink.click();
+        URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error('Error downloading presentation:', error);
+        alert('Error creating offline presentation. Please try again.');
+      } finally {
+        setIsDownloading(false);
+      }
+    },
+    [createPresentationHTML, markdownInput, cdnUrls, isDownloading]
+  );
+
+  const handleDownloadHTML = useCallback(
+    showNotes => {
+      downloadOfflinePresentation(showNotes);
+    },
+    [downloadOfflinePresentation]
+  );
+
+  const handleExportPDF = useCallback(
+    showNotes => {
+      exportToPDF(showNotes);
+    },
+    [exportToPDF]
+  );
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = event => {
+      if (exportDropdownOpen && !event.target.closest('.export-dropdown')) {
+        setExportDropdownOpen(false);
+        setActiveSubMenu(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [exportDropdownOpen]);
 
   return (
     <div className="flex flex-col lg:flex-row h-screen bg-background font-sans">
@@ -1021,42 +1384,15 @@ ${notesJS}
               value={selectedTransition}
               onChange={setSelectedTransition}
             />
-            <div>
-              <label className="text-sm font-medium text-transparent select-none">
-                Download
-              </label>
-              <button
-                onClick={downloadOfflinePresentation}
-                disabled={isDownloading}
-                className="mt-1 px-4 py-2 bg-surface border border-border text-text-primary rounded-md hover:bg-background disabled:opacity-50 text-sm font-semibold transition-colors flex items-center gap-2"
-                aria-label="Download presentation as offline HTML file"
-              >
-                {isDownloading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
-                    <span>Downloading...</span>
-                  </>
-                ) : (
-                  <>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                      />
-                    </svg>
-                    <span>Download</span>
-                  </>
-                )}
-              </button>
-            </div>
+            <ExportDropdown
+              onDownloadHTML={handleDownloadHTML}
+              onExportPDF={handleExportPDF}
+              isDownloading={isDownloading}
+              isOpen={exportDropdownOpen}
+              onToggle={() => setExportDropdownOpen(!exportDropdownOpen)}
+              activeSubMenu={activeSubMenu}
+              onSubMenuChange={setActiveSubMenu}
+            />
           </div>
         </div>
 
