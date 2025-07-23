@@ -5,6 +5,24 @@ export const markslideThemeCSS = `
  */
 @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&display=swap');
 
+html, body, .reveal {
+  background-color: var(--r-background-color);
+  min-height: 100vh;
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.reveal > .slides,
+.reveal > .slides > section,
+body,
+.reveal,
+.reveal .slides,
+.reveal .slides section {
+  background-color: var(--r-background-color) !important;
+  min-height: 100vh;
+}
+
 :root {
   --r-background-color: #f5f4ed;
   --r-main-font: 'Lora', Georgia, 'Times New Roman', Times, serif;
