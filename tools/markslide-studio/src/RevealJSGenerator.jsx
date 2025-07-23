@@ -7,7 +7,7 @@ const REVEAL_JS_VERSION = '5.2.1';
 const CDN_BASE_URL = `https://cdnjs.cloudflare.com/ajax/libs/reveal.js/${REVEAL_JS_VERSION}`;
 
 const THEME_OPTIONS = [
-  { value: 'markslide', label: 'Markslide' },
+  { value: 'markslide', label: 'MarkSlide' },
   { value: 'black', label: 'Black' },
   { value: 'white', label: 'White' },
   { value: 'league', label: 'League' },
@@ -975,7 +975,7 @@ ${notesJS}
       {/* Sidebar */}
       <aside className="w-full lg:w-1/2 h-1/2 lg:h-full flex flex-col bg-sidebar p-4 border-r border-border">
         <h1 className="text-xl font-bold text-text-primary mb-4">
-          Markslide Studio
+          MarkSlide Studio
         </h1>
 
         <div className="flex items-center justify-between mb-4">

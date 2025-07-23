@@ -1,7 +1,7 @@
 export const markslideThemeCSS = `
 /**
- * Markslide theme for reveal.js
- * Derived from the Markslide Studio app design.
+ * MarkSlide theme for reveal.js
+ * Derived from the MarkSlide Studio app design.
  */
 @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&display=swap');
 
