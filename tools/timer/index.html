@@ -1,637 +1,694 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Timer</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+          Cantarell, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+      }
 
-        .container {
-            text-align: center;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 3rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            width: 500px;
-        }
+      .container {
+        text-align: center;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 3rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        width: 500px;
+      }
 
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 2rem;
-            font-weight: 300;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
-        }
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+        font-weight: 300;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+      }
 
-        h1.hidden {
-            opacity: 0;
-            visibility: hidden;
-            height: 0;
-            margin: 0;
-        }
+      h1.hidden {
+        opacity: 0;
+        visibility: hidden;
+        height: 0;
+        margin: 0;
+      }
 
-        .input-section {
-            margin-bottom: 2rem;
-            transition: all 0.3s ease;
-        }
+      .input-section {
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+      }
 
-        .input-section.hidden {
-            opacity: 0;
-            visibility: hidden;
-            height: 0;
-            margin: 0;
-        }
+      .input-section.hidden {
+        opacity: 0;
+        visibility: hidden;
+        height: 0;
+        margin: 0;
+      }
 
-        .time-inputs {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
+      .time-inputs {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
 
-        .time-input {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+      .time-input {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
 
-        .time-input label {
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-            opacity: 0.9;
-        }
+      .time-input label {
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+        opacity: 0.9;
+      }
 
-        .time-input input {
-            width: 60px;
-            height: 60px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 1.2rem;
-            text-align: center;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
+      .time-input input {
+        width: 60px;
+        height: 60px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        font-size: 1.2rem;
+        text-align: center;
+        font-weight: bold;
+        transition: all 0.3s ease;
+      }
 
-        .time-input input:focus {
-            outline: none;
-            border-color: rgba(255, 255, 255, 0.8);
-            background: rgba(255, 255, 255, 0.2);
-        }
+      .time-input input:focus {
+        outline: none;
+        border-color: rgba(255, 255, 255, 0.8);
+        background: rgba(255, 255, 255, 0.2);
+      }
 
-        .time-input input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
+      .time-input input::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+      }
 
-        .separator {
-            font-size: 2rem;
-            font-weight: bold;
-            margin: 0 0.5rem;
-            align-self: flex-end;
-            margin-bottom: 1rem;
-        }
+      .separator {
+        font-size: 2rem;
+        font-weight: bold;
+        margin: 0 0.5rem;
+        align-self: flex-end;
+        margin-bottom: 1rem;
+      }
 
-        .display {
-            font-size: 4rem;
-            font-weight: 300;
-            margin: 2rem 0;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
+      .display {
+        font-size: 4rem;
+        font-weight: 300;
+        margin: 2rem 0;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
 
-        .display.running {
-            font-size: 8rem;
-            font-weight: 200;
-            margin: 6rem 0;
-        }
+      .display.running {
+        font-size: 8rem;
+        font-weight: 200;
+        margin: 6rem 0;
+      }
 
-        .display.running:hover {
-            transform: scale(1.02);
-            opacity: 0.9;
-        }
+      .display.running:hover {
+        transform: scale(1.02);
+        opacity: 0.9;
+      }
 
-        .display.warning {
-            color: #ff6b6b;
-            animation: pulse 1s infinite;
-        }
+      .display.warning {
+        color: #ff6b6b;
+        animation: pulse 1s infinite;
+      }
 
-        .display.finished {
-            color: #ff4444;
-            animation: flashRed 0.5s infinite;
-        }
+      .display.finished {
+        color: #ff4444;
+        animation: flashRed 0.5s infinite;
+      }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
         }
+        50% {
+          transform: scale(1.05);
+        }
+      }
 
-        @keyframes flashRed {
-            0%, 100% { color: #ff4444; transform: scale(1); }
-            50% { color: #ff0000; transform: scale(1.1); }
+      @keyframes flashRed {
+        0%,
+        100% {
+          color: #ff4444;
+          transform: scale(1);
         }
+        50% {
+          color: #ff0000;
+          transform: scale(1.1);
+        }
+      }
 
-        .controls {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin-top: 2rem;
-            transition: all 0.3s ease;
-        }
+      .controls {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+        transition: all 0.3s ease;
+      }
 
-        .controls.minimized {
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
+      .controls.minimized {
+        gap: 0.5rem;
+        margin-top: 1rem;
+      }
 
-        .controls.minimized button {
-            padding: 0.4rem 1rem;
-            font-size: 0.8rem;
-            border-radius: 15px;
-        }
+      .controls.minimized button {
+        padding: 0.4rem 1rem;
+        font-size: 0.8rem;
+        border-radius: 15px;
+      }
 
-        button {
-            padding: 0.8rem 2rem;
-            border: none;
-            border-radius: 25px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
+      button {
+        padding: 0.8rem 2rem;
+        border: none;
+        border-radius: 25px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
 
-        .start-btn {
-            background: linear-gradient(45deg, #00c851, #00ff70);
-            color: white;
-        }
+      .start-btn {
+        background: linear-gradient(45deg, #00c851, #00ff70);
+        color: white;
+      }
 
-        .start-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 200, 81, 0.4);
-        }
+      .start-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 200, 81, 0.4);
+      }
 
-        .pause-btn {
-            background: linear-gradient(45deg, #ffbb33, #ff8800);
-            color: white;
-        }
+      .pause-btn {
+        background: linear-gradient(45deg, #ffbb33, #ff8800);
+        color: white;
+      }
 
-        .pause-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 187, 51, 0.4);
-        }
+      .pause-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 187, 51, 0.4);
+      }
 
-        .reset-btn {
-            background: linear-gradient(45deg, #ff4444, #cc0000);
-            color: white;
-        }
+      .reset-btn {
+        background: linear-gradient(45deg, #ff4444, #cc0000);
+        color: white;
+      }
 
-        .reset-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 68, 68, 0.4);
-        }
+      .reset-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 68, 68, 0.4);
+      }
 
-        .stop-btn {
-            background: linear-gradient(45deg, #666, #333);
-            color: white;
-            padding: 1.2rem 3rem;
-            font-size: 1.4rem;
-            font-weight: 700;
-        }
+      .stop-btn {
+        background: linear-gradient(45deg, #666, #333);
+        color: white;
+        padding: 1.2rem 3rem;
+        font-size: 1.4rem;
+        font-weight: 700;
+      }
 
-        .stop-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 102, 102, 0.4);
-        }
+      .stop-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 102, 102, 0.4);
+      }
 
-        .status {
-            margin-top: 1rem;
-            font-size: 1.1rem;
-            opacity: 0.9;
-            transition: all 0.3s ease;
-        }
+      .status {
+        margin-top: 1rem;
+        font-size: 1.1rem;
+        opacity: 0.9;
+        transition: all 0.3s ease;
+      }
 
-        .status.hidden {
-            opacity: 0;
-            visibility: hidden;
-            height: 0;
-            margin: 0;
-        }
+      .status.hidden {
+        opacity: 0;
+        visibility: hidden;
+        height: 0;
+        margin: 0;
+      }
 
-        .finished {
-            color: #ff6b6b;
-            font-weight: bold;
-            animation: blink 0.5s infinite;
-        }
+      .finished {
+        color: #ff6b6b;
+        font-weight: bold;
+        animation: blink 0.5s infinite;
+      }
 
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0.3; }
+      @keyframes blink {
+        0%,
+        50% {
+          opacity: 1;
         }
+        51%,
+        100% {
+          opacity: 0.3;
+        }
+      }
 
-        .progress-bar {
-            width: 100%;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 2px;
-            margin: 1rem 0;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
+      .progress-bar {
+        width: 100%;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 2px;
+        margin: 1rem 0;
+        overflow: hidden;
+        transition: all 0.3s ease;
+      }
 
-        .progress-bar.hidden {
-            opacity: 0;
-            visibility: hidden;
-            height: 0;
-            margin: 0;
-        }
+      .progress-bar.hidden {
+        opacity: 0;
+        visibility: hidden;
+        height: 0;
+        margin: 0;
+      }
 
-        .progress {
-            height: 100%;
-            background: linear-gradient(90deg, #00c851, #00ff70);
-            transition: width 0.1s ease;
-            border-radius: 2px;
-        }
+      .progress {
+        height: 100%;
+        background: linear-gradient(90deg, #00c851, #00ff70);
+        transition: width 0.1s ease;
+        border-radius: 2px;
+      }
 
-        .sound-controls {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-            margin-top: 1rem;
-            opacity: 0.8;
-        }
+      .sound-controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1rem;
+        opacity: 0.8;
+      }
 
-        .sound-toggle {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 15px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
+      .sound-toggle {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 15px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
 
-        .sound-toggle:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
+      .sound-toggle:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
 
-        .sound-toggle.disabled {
-            background: rgba(255, 0, 0, 0.2);
-            border-color: rgba(255, 0, 0, 0.5);
-        }
+      .sound-toggle.disabled {
+        background: rgba(255, 0, 0, 0.2);
+        border-color: rgba(255, 0, 0, 0.5);
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <h1>Timer</h1>
-        
-        <div class="input-section">
-            <div class="time-inputs">
-                <div class="time-input">
-                    <label>Hours</label>
-                    <input type="number" id="hours" min="0" max="23" value="0" placeholder="00">
-                </div>
-                <div class="separator">:</div>
-                <div class="time-input">
-                    <label>Minutes</label>
-                    <input type="number" id="minutes" min="0" max="59" value="5" placeholder="00">
-                </div>
-                <div class="separator">:</div>
-                <div class="time-input">
-                    <label>Seconds</label>
-                    <input type="number" id="seconds" min="0" max="59" value="0" placeholder="00">
-                </div>
-            </div>
-        </div>
+      <h1>Timer</h1>
 
-        <div class="display" id="display">05:00</div>
-        
-        <div class="progress-bar">
-            <div class="progress" id="progress"></div>
+      <div class="input-section">
+        <div class="time-inputs">
+          <div class="time-input">
+            <label>Hours</label>
+            <input
+              type="number"
+              id="hours"
+              min="0"
+              max="23"
+              value="0"
+              placeholder="00"
+            />
+          </div>
+          <div class="separator">:</div>
+          <div class="time-input">
+            <label>Minutes</label>
+            <input
+              type="number"
+              id="minutes"
+              min="0"
+              max="59"
+              value="5"
+              placeholder="00"
+            />
+          </div>
+          <div class="separator">:</div>
+          <div class="time-input">
+            <label>Seconds</label>
+            <input
+              type="number"
+              id="seconds"
+              min="0"
+              max="59"
+              value="0"
+              placeholder="00"
+            />
+          </div>
         </div>
+      </div>
 
-        <div class="controls">
-            <button class="start-btn" id="startBtn">Start</button>
-            <button class="pause-btn" id="pauseBtn">Pause</button>
-            <button class="reset-btn" id="resetBtn">Reset</button>
-            <button class="stop-btn" id="stopBtn" style="display: none;">Stop Alarm</button>
-        </div>
+      <div class="display" id="display">05:00</div>
 
-        <div class="sound-controls">
-            <button class="sound-toggle" id="soundToggle">🔊 Sound: ON</button>
-        </div>
+      <div class="progress-bar">
+        <div class="progress" id="progress"></div>
+      </div>
 
-        <div class="status" id="status"></div>
+      <div class="controls">
+        <button class="start-btn" id="startBtn">Start</button>
+        <button class="pause-btn" id="pauseBtn">Pause</button>
+        <button class="reset-btn" id="resetBtn">Reset</button>
+        <button class="stop-btn" id="stopBtn" style="display: none">
+          Stop Alarm
+        </button>
+      </div>
+
+      <div class="sound-controls">
+        <button class="sound-toggle" id="soundToggle">🔊 Sound: ON</button>
+      </div>
+
+      <div class="status" id="status"></div>
     </div>
 
     <script>
-        let timer = null;
-        let alarmInterval = null;
-        let totalSeconds = 0;
-        let remainingSeconds = 0;
-        let isRunning = false;
-        let isFinished = false;
-        let soundEnabled = true;
+      let timer = null;
+      let alarmInterval = null;
+      let totalSeconds = 0;
+      let remainingSeconds = 0;
+      let isRunning = false;
+      let isFinished = false;
+      let soundEnabled = true;
 
-        const display = document.getElementById('display');
-        const title = document.querySelector('h1');
-        const startBtn = document.getElementById('startBtn');
-        const pauseBtn = document.getElementById('pauseBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const stopBtn = document.getElementById('stopBtn');
-        const status = document.getElementById('status');
-        const progress = document.getElementById('progress');
-        const progressBar = document.getElementById('progress').parentElement;
-        const controls = document.querySelector('.controls');
-        const inputSection = document.querySelector('.input-section');
-        const soundToggle = document.getElementById('soundToggle');
-        const hoursInput = document.getElementById('hours');
-        const minutesInput = document.getElementById('minutes');
-        const secondsInput = document.getElementById('seconds');
+      const display = document.getElementById('display');
+      const title = document.querySelector('h1');
+      const startBtn = document.getElementById('startBtn');
+      const pauseBtn = document.getElementById('pauseBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const stopBtn = document.getElementById('stopBtn');
+      const status = document.getElementById('status');
+      const progress = document.getElementById('progress');
+      const progressBar = document.getElementById('progress').parentElement;
+      const controls = document.querySelector('.controls');
+      const inputSection = document.querySelector('.input-section');
+      const soundToggle = document.getElementById('soundToggle');
+      const hoursInput = document.getElementById('hours');
+      const minutesInput = document.getElementById('minutes');
+      const secondsInput = document.getElementById('seconds');
 
-        function formatTime(seconds) {
-            const hours = Math.floor(seconds / 3600);
-            const minutes = Math.floor((seconds % 3600) / 60);
-            const secs = seconds % 60;
-            
-            if (hours > 0) {
-                return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-            } else {
-                return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      function formatTime(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+
+        if (hours > 0) {
+          return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        } else {
+          return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+      }
+
+      function updateDisplay() {
+        display.textContent = formatTime(remainingSeconds);
+
+        if (remainingSeconds <= 10 && remainingSeconds > 0) {
+          if (!display.classList.contains('warning')) {
+            display.classList.add('warning');
+          }
+        } else {
+          display.classList.remove('warning');
+        }
+
+        // Update progress bar
+        const progressPercent =
+          totalSeconds > 0
+            ? ((totalSeconds - remainingSeconds) / totalSeconds) * 100
+            : 0;
+        progress.style.width = progressPercent + '%';
+      }
+
+      function createCountdownBeep() {
+        if (!soundEnabled) return;
+
+        const audioContext = new (window.AudioContext ||
+          window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        oscillator.frequency.value = 1000; // Higher pitch for countdown
+        oscillator.type = 'sine';
+
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(
+          0.01,
+          audioContext.currentTime + 0.2
+        );
+
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.2);
+      }
+
+      function createAlarmBeep() {
+        if (!soundEnabled) return;
+
+        const audioContext = new (window.AudioContext ||
+          window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        oscillator.frequency.value = 800; // Lower pitch for alarm
+        oscillator.type = 'square'; // More urgent sound
+
+        gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(
+          0.01,
+          audioContext.currentTime + 0.8
+        );
+
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.8);
+      }
+
+      function startTimer() {
+        if (!isRunning && !isFinished) {
+          // Calculate total seconds from inputs
+          const hours = parseInt(hoursInput.value) || 0;
+          const minutes = parseInt(minutesInput.value) || 0;
+          const seconds = parseInt(secondsInput.value) || 0;
+
+          if (remainingSeconds === 0) {
+            totalSeconds = hours * 3600 + minutes * 60 + seconds;
+            remainingSeconds = totalSeconds;
+          }
+
+          if (remainingSeconds <= 0) {
+            status.textContent = 'Please set a time!';
+            return;
+          }
+
+          isRunning = true;
+
+          // Minimize other components but keep them visible
+          title.classList.add('hidden');
+          inputSection.classList.add('hidden');
+          controls.classList.add('minimized');
+          status.classList.add('hidden');
+          progressBar.classList.add('hidden');
+          display.classList.add('running');
+
+          startBtn.textContent = 'Pause';
+
+          timer = setInterval(() => {
+            remainingSeconds--;
+            updateDisplay();
+
+            // Play sound during final 5 seconds
+            if (remainingSeconds <= 5 && remainingSeconds > 0) {
+              createCountdownBeep();
             }
-        }
 
-        function updateDisplay() {
-            display.textContent = formatTime(remainingSeconds);
-            
-            if (remainingSeconds <= 10 && remainingSeconds > 0) {
-                if (!display.classList.contains('warning')) {
-                    display.classList.add('warning');
-                }
-            } else {
-                display.classList.remove('warning');
+            if (remainingSeconds <= 0) {
+              clearInterval(timer);
+              isRunning = false;
+              isFinished = true;
+
+              // Show stop button and hide other controls
+              startBtn.style.display = 'none';
+              pauseBtn.style.display = 'none';
+              resetBtn.style.display = 'none';
+              stopBtn.style.display = 'inline-block';
+
+              display.classList.add('finished');
+              display.textContent = "TIME'S UP!";
+
+              // Start continuous alarm
+              createAlarmBeep(); // Initial beep
+              alarmInterval = setInterval(() => {
+                createAlarmBeep();
+              }, 1000);
             }
-
-            // Update progress bar
-            const progressPercent = totalSeconds > 0 ? ((totalSeconds - remainingSeconds) / totalSeconds) * 100 : 0;
-            progress.style.width = progressPercent + '%';
+          }, 1000);
         }
+      }
 
-        function createCountdownBeep() {
-            if (!soundEnabled) return;
-            
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.frequency.value = 1000; // Higher pitch for countdown
-            oscillator.type = 'sine';
-            
-            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
-            
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.2);
+      function pauseTimer() {
+        if (isRunning) {
+          clearInterval(timer);
+          isRunning = false;
+          startBtn.textContent = 'Resume';
         }
+      }
 
-        function createAlarmBeep() {
-            if (!soundEnabled) return;
-            
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.frequency.value = 800; // Lower pitch for alarm
-            oscillator.type = 'square'; // More urgent sound
-            
-            gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8);
-            
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.8);
-        }
+      function stopAlarm() {
+        clearInterval(alarmInterval);
+        isFinished = false;
 
-        function startTimer() {
-            if (!isRunning && !isFinished) {
-                // Calculate total seconds from inputs
-                const hours = parseInt(hoursInput.value) || 0;
-                const minutes = parseInt(minutesInput.value) || 0;
-                const seconds = parseInt(secondsInput.value) || 0;
-                
-                if (remainingSeconds === 0) {
-                    totalSeconds = hours * 3600 + minutes * 60 + seconds;
-                    remainingSeconds = totalSeconds;
-                }
-                
-                if (remainingSeconds <= 0) {
-                    status.textContent = 'Please set a time!';
-                    return;
-                }
-                
-                isRunning = true;
-                
-                // Minimize other components but keep them visible
-                title.classList.add('hidden');
-                inputSection.classList.add('hidden');
-                controls.classList.add('minimized');
-                status.classList.add('hidden');
-                progressBar.classList.add('hidden');
-                display.classList.add('running');
-                
-                startBtn.textContent = 'Pause';
-                
-                timer = setInterval(() => {
-                    remainingSeconds--;
-                    updateDisplay();
-                    
-                    // Play sound during final 5 seconds
-                    if (remainingSeconds <= 5 && remainingSeconds > 0) {
-                        createCountdownBeep();
-                    }
-                    
-                    if (remainingSeconds <= 0) {
-                        clearInterval(timer);
-                        isRunning = false;
-                        isFinished = true;
-                        
-                        // Show stop button and hide other controls
-                        startBtn.style.display = 'none';
-                        pauseBtn.style.display = 'none';
-                        resetBtn.style.display = 'none';
-                        stopBtn.style.display = 'inline-block';
-                        
-                        display.classList.add('finished');
-                        display.textContent = 'TIME\'S UP!';
-                        
-                        // Start continuous alarm
-                        createAlarmBeep(); // Initial beep
-                        alarmInterval = setInterval(() => {
-                            createAlarmBeep();
-                        }, 1000);
-                    }
-                }, 1000);
-            }
-        }
+        // Show all controls again
+        startBtn.style.display = 'inline-block';
+        pauseBtn.style.display = 'inline-block';
+        resetBtn.style.display = 'inline-block';
+        stopBtn.style.display = 'none';
 
-        function pauseTimer() {
-            if (isRunning) {
-                clearInterval(timer);
-                isRunning = false;
-                startBtn.textContent = 'Resume';
-            }
-        }
+        display.classList.remove('finished');
 
-        function stopAlarm() {
-            clearInterval(alarmInterval);
-            isFinished = false;
-            
-            // Show all controls again
-            startBtn.style.display = 'inline-block';
-            pauseBtn.style.display = 'inline-block';
-            resetBtn.style.display = 'inline-block';
-            stopBtn.style.display = 'none';
-            
-            display.classList.remove('finished');
-            
-            // Reset everything
-            resetTimer();
-        }
+        // Reset everything
+        resetTimer();
+      }
 
-        function resetTimer() {
-            clearInterval(timer);
-            clearInterval(alarmInterval);
-            isRunning = false;
-            isFinished = false;
-            remainingSeconds = 0;
-            totalSeconds = 0;
-            
-            // Show all components again
-            title.classList.remove('hidden');
-            inputSection.classList.remove('hidden');
-            controls.classList.remove('minimized');
-            status.classList.remove('hidden');
-            progressBar.classList.remove('hidden');
-            display.classList.remove('running');
-            display.classList.remove('finished');
-            
-            // Show/hide correct buttons
-            startBtn.style.display = 'inline-block';
-            pauseBtn.style.display = 'inline-block';
-            resetBtn.style.display = 'inline-block';
-            stopBtn.style.display = 'none';
-            
-            startBtn.textContent = 'Start';
-            status.textContent = '';
-            
-            // Reset to input values
+      function resetTimer() {
+        clearInterval(timer);
+        clearInterval(alarmInterval);
+        isRunning = false;
+        isFinished = false;
+        remainingSeconds = 0;
+        totalSeconds = 0;
+
+        // Show all components again
+        title.classList.remove('hidden');
+        inputSection.classList.remove('hidden');
+        controls.classList.remove('minimized');
+        status.classList.remove('hidden');
+        progressBar.classList.remove('hidden');
+        display.classList.remove('running');
+        display.classList.remove('finished');
+
+        // Show/hide correct buttons
+        startBtn.style.display = 'inline-block';
+        pauseBtn.style.display = 'inline-block';
+        resetBtn.style.display = 'inline-block';
+        stopBtn.style.display = 'none';
+
+        startBtn.textContent = 'Start';
+        status.textContent = '';
+
+        // Reset to input values
+        const hours = parseInt(hoursInput.value) || 0;
+        const minutes = parseInt(minutesInput.value) || 0;
+        const seconds = parseInt(secondsInput.value) || 0;
+        const inputSeconds = hours * 3600 + minutes * 60 + seconds;
+
+        display.textContent = formatTime(inputSeconds);
+        display.classList.remove('warning');
+        progress.style.width = '0%';
+      }
+
+      function toggleSound() {
+        soundEnabled = !soundEnabled;
+        soundToggle.textContent = soundEnabled
+          ? '🔊 Sound: ON'
+          : '🔇 Sound: OFF';
+        soundToggle.classList.toggle('disabled', !soundEnabled);
+      }
+
+      // Event listeners
+      startBtn.addEventListener('click', startTimer);
+      pauseBtn.addEventListener('click', pauseTimer);
+      resetBtn.addEventListener('click', resetTimer);
+      stopBtn.addEventListener('click', stopAlarm);
+      soundToggle.addEventListener('click', toggleSound);
+
+      // Update display when inputs change
+      [hoursInput, minutesInput, secondsInput].forEach(input => {
+        input.addEventListener('input', () => {
+          if (!isRunning && !isFinished) {
             const hours = parseInt(hoursInput.value) || 0;
             const minutes = parseInt(minutesInput.value) || 0;
             const seconds = parseInt(secondsInput.value) || 0;
             const inputSeconds = hours * 3600 + minutes * 60 + seconds;
-            
             display.textContent = formatTime(inputSeconds);
-            display.classList.remove('warning');
-            progress.style.width = '0%';
-        }
-
-        function toggleSound() {
-            soundEnabled = !soundEnabled;
-            soundToggle.textContent = soundEnabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
-            soundToggle.classList.toggle('disabled', !soundEnabled);
-        }
-
-        // Event listeners
-        startBtn.addEventListener('click', startTimer);
-        pauseBtn.addEventListener('click', pauseTimer);
-        resetBtn.addEventListener('click', resetTimer);
-        stopBtn.addEventListener('click', stopAlarm);
-        soundToggle.addEventListener('click', toggleSound);
-
-        // Update display when inputs change
-        [hoursInput, minutesInput, secondsInput].forEach(input => {
-            input.addEventListener('input', () => {
-                if (!isRunning && !isFinished) {
-                    const hours = parseInt(hoursInput.value) || 0;
-                    const minutes = parseInt(minutesInput.value) || 0;
-                    const seconds = parseInt(secondsInput.value) || 0;
-                    const inputSeconds = hours * 3600 + minutes * 60 + seconds;
-                    display.textContent = formatTime(inputSeconds);
-                }
-            });
+          }
         });
+      });
 
-        // Add keyboard shortcuts and click handler
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space' || e.key === ' ') {
-                e.preventDefault();
-                if (isFinished) {
-                    stopAlarm();
-                } else if (isRunning) {
-                    pauseTimer();
-                } else if (remainingSeconds > 0) {
-                    startTimer();
-                } else {
-                    resetTimer();
-                }
-            } else if (e.key === 'Escape') {
-                e.preventDefault();
-                if (isFinished) {
-                    stopAlarm();
-                } else {
-                    resetTimer();
-                }
-            }
-        });
-
-        // Click on timer display to pause/resume or stop alarm
-        display.addEventListener('click', () => {
-            if (isFinished) {
-                stopAlarm();
-            } else if (isRunning) {
-                pauseTimer();
-            } else if (remainingSeconds > 0) {
-                startTimer();
-            }
-        });
-
-        // Initialize display with default values
-        function initializeDisplay() {
-            const initHours = parseInt(hoursInput.value) || 0;
-            const initMinutes = parseInt(minutesInput.value) || 0;
-            const initSeconds = parseInt(secondsInput.value) || 0;
-            const initTotalSeconds = initHours * 3600 + initMinutes * 60 + initSeconds;
-            display.textContent = formatTime(initTotalSeconds);
-            progress.style.width = '0%';
+      // Add keyboard shortcuts and click handler
+      document.addEventListener('keydown', e => {
+        if (e.code === 'Space' || e.key === ' ') {
+          e.preventDefault();
+          if (isFinished) {
+            stopAlarm();
+          } else if (isRunning) {
+            pauseTimer();
+          } else if (remainingSeconds > 0) {
+            startTimer();
+          } else {
+            resetTimer();
+          }
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          if (isFinished) {
+            stopAlarm();
+          } else {
+            resetTimer();
+          }
         }
-        
-        initializeDisplay();
+      });
+
+      // Click on timer display to pause/resume or stop alarm
+      display.addEventListener('click', () => {
+        if (isFinished) {
+          stopAlarm();
+        } else if (isRunning) {
+          pauseTimer();
+        } else if (remainingSeconds > 0) {
+          startTimer();
+        }
+      });
+
+      // Initialize display with default values
+      function initializeDisplay() {
+        const initHours = parseInt(hoursInput.value) || 0;
+        const initMinutes = parseInt(minutesInput.value) || 0;
+        const initSeconds = parseInt(secondsInput.value) || 0;
+        const initTotalSeconds =
+          initHours * 3600 + initMinutes * 60 + initSeconds;
+        display.textContent = formatTime(initTotalSeconds);
+        progress.style.width = '0%';
+      }
+
+      initializeDisplay();
     </script>
-</body>
+  </body>
 </html>

@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Browser Toolkit - Web Tools Collection</title>
     <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+      :root {
+        --background: #f5f4ed;
+        --surface: #fcfbf7;
+        --border: #e4e2da;
+        --text-primary: #383631;
+        --text-secondary: #7a7874;
+        --primary: #607d8b;
+        --primary-hover: #546e7a;
+      }
+
       * {
         margin: 0;
         padding: 0;
@@ -13,28 +25,31 @@
 
       body {
         font-family:
-          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
-          Cantarell, sans-serif;
+          'Inter',
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          Roboto,
+          Oxygen,
+          Ubuntu,
+          Cantarell,
+          sans-serif;
         line-height: 1.6;
-        color: #333;
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        color: var(--text-primary);
+        background-color: var(--background);
         min-height: 100vh;
         padding: 2rem 1rem;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
       }
 
       .container {
         max-width: 1200px;
         margin: 0 auto;
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
       }
 
       .header {
-        background: linear-gradient(135deg, #6c5ce7 0%, #74b9ff 100%);
-        color: white;
-        padding: 3rem 2rem;
+        padding: 4rem 2rem;
         text-align: center;
       }
 
@@ -42,86 +57,83 @@
         font-size: 3rem;
         font-weight: 700;
         margin-bottom: 0.5rem;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
       }
 
       .header p {
         font-size: 1.2rem;
-        opacity: 0.9;
+        color: var(--text-secondary);
+        max-width: 600px;
+        margin: 0 auto;
       }
 
       .tools-grid {
-        padding: 3rem 2rem;
+        padding: 1rem 2rem 3rem;
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         gap: 2rem;
       }
 
       .tool-card {
-        background: #f8fafc;
+        background: var(--surface);
         border-radius: 12px;
-        padding: 2rem;
+        padding: 1.5rem;
         transition: all 0.3s ease;
-        border: 1px solid #e2e8f0;
+        border: 1px solid var(--border);
+        display: block;
+        text-decoration: none;
+        color: var(--text-primary);
         position: relative;
-        overflow: hidden;
-      }
-
-      .tool-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #6c5ce7, #74b9ff);
       }
 
       .tool-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-        background: white;
+        border-color: var(--primary);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        transform: translateY(-2px);
       }
 
-      .tool-card h3 {
+      .tool-card::after {
+        content: '→';
+        position: absolute;
+        right: 1.5rem;
+        top: 50%;
+        transform: translateY(-50%);
         font-size: 1.5rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
-        color: #1e293b;
-      }
-
-      .tool-card p {
-        color: #64748b;
-        margin-bottom: 1.5rem;
-        line-height: 1.6;
-      }
-
-      .tool-card .launch-btn {
-        display: inline-block;
-        background: linear-gradient(135deg, #6c5ce7 0%, #74b9ff 100%);
-        color: white;
-        text-decoration: none;
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        font-weight: 500;
+        color: var(--text-secondary);
+        opacity: 0;
         transition: all 0.3s ease;
       }
 
-      .tool-card .launch-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 16px rgba(108, 92, 231, 0.3);
+      .tool-card:hover::after {
+        opacity: 1;
+        color: var(--primary);
+      }
+
+      .tool-card h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .tool-card p {
+        color: var(--text-secondary);
+        line-height: 1.5;
+        padding-right: 2rem; /* Make space for the arrow */
+      }
+
+      .launch-btn {
+        display: none;
       }
 
       .footer {
-        background: #f1f5f9;
         padding: 2rem;
         text-align: center;
-        color: #64748b;
-        border-top: 1px solid #e2e8f0;
+        color: var(--text-secondary);
+        border-top: 1px solid var(--border);
+        margin-top: 4rem;
       }
 
       .footer a {
-        color: #6c5ce7;
+        color: var(--primary);
         text-decoration: none;
         font-weight: 500;
         transition: all 0.3s ease;
@@ -129,16 +141,20 @@
 
       .footer a:hover {
         text-decoration: underline;
+        color: var(--primary-hover);
       }
 
       @media (max-width: 768px) {
+        .header {
+          padding: 2rem 1rem;
+        }
         .header h1 {
-          font-size: 2rem;
+          font-size: 2.5rem;
         }
 
         .tools-grid {
           grid-template-columns: 1fr;
-          padding: 2rem 1rem;
+          padding: 1rem;
         }
       }
     </style>
@@ -151,25 +167,15 @@
       </header>
 
       <main class="tools-grid">
-        <div class="tool-card">
+        <a href="./markslide-studio/" class="tool-card">
           <h3>🎬 MarkSlide Studio</h3>
-          <p>
-            Create stunning presentations from Markdown. Convert your markdown
-            documents into beautiful RevealJS presentations with themes and
-            animations.
-          </p>
-          <a href="./markslide-studio/" class="launch-btn">Launch Studio</a>
-        </div>
+          <p>Create presentations from Markdown.</p>
+        </a>
 
-        <div class="tool-card">
+        <a href="./timer/" class="tool-card">
           <h3>⏱️ Timer</h3>
-          <p>
-            A simple, elegant countdown timer for productivity, cooking, or any
-            time-based tasks. Features visual and audio notifications when time
-            is up.
-          </p>
-          <a href="./timer/" class="launch-btn">Launch Timer</a>
-        </div>
+          <p>A simple and elegant countdown timer.</p>
+        </a>
       </main>
 
       <footer class="footer">

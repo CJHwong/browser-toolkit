@@ -15,7 +15,7 @@ const THEME_OPTIONS = [
   { value: 'simple', label: 'Simple' },
   { value: 'solarized', label: 'Solarized' },
   { value: 'blood', label: 'Blood' },
-  { value: 'moon', label: 'Moon' }
+  { value: 'moon', label: 'Moon' },
 ];
 
 const TRANSITION_OPTIONS = [
@@ -24,7 +24,7 @@ const TRANSITION_OPTIONS = [
   { value: 'convex', label: 'Convex' },
   { value: 'concave', label: 'Concave' },
   { value: 'zoom', label: 'Zoom' },
-  { value: 'none', label: 'None' }
+  { value: 'none', label: 'None' },
 ];
 
 const DEFAULT_MARKDOWN = `# 🚀 Welcome to My Presentation
@@ -201,7 +201,7 @@ This slide demonstrates speaker notes functionality.
 </aside>`;
 
 // Utility functions
-const createFilenameFriendlyString = (title) => {
+const createFilenameFriendlyString = title => {
   return title
     .replace(/[^\w\s-]/g, '')
     .replace(/\s+/g, '-')
@@ -209,10 +209,10 @@ const createFilenameFriendlyString = (title) => {
     .substring(0, 50);
 };
 
-const extractTitleFromMarkdown = (markdown) => {
+const extractTitleFromMarkdown = markdown => {
   const firstSlide = markdown.split(/\n---\n/)[0];
   const titleMatch = firstSlide.match(/^#\s+(.+)$/m);
-  
+
   if (titleMatch) {
     return createFilenameFriendlyString(titleMatch[1]);
   }
@@ -220,34 +220,34 @@ const extractTitleFromMarkdown = (markdown) => {
 };
 
 // Markdown processing functions
-const extractSlideAttributes = (content) => {
+const extractSlideAttributes = content => {
   const headerWithAttrs = content.match(/^(#{1,6})\s+(.*?)\s*\{([^}]+)\}/m);
   if (headerWithAttrs) {
     const [fullMatch, hashes, title, attrs] = headerWithAttrs;
     const newContent = content.replace(fullMatch, `${hashes} ${title}`);
     return {
       content: newContent,
-      attributes: ` ${attrs}`
+      attributes: ` ${attrs}`,
     };
   }
   return { content, attributes: '' };
 };
 
-const processLists = (content) => {
+const processLists = content => {
   const lines = content.split('\n');
   const result = [];
   let currentList = null;
   let listType = null;
-  
+
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const trimmedLine = line.trim();
-    
+
     // Check for unordered list items (-, *, +)
     const unorderedMatch = trimmedLine.match(/^[-*+]\s+(.+)$/);
     // Check for ordered list items (1., 2., etc.)
     const orderedMatch = trimmedLine.match(/^\d+\.\s+(.+)$/);
-    
+
     if (unorderedMatch) {
       if (currentList === null || listType !== 'ul') {
         if (currentList !== null) {
@@ -278,48 +278,61 @@ const processLists = (content) => {
       result.push(line);
     }
   }
-  
+
   // Close any remaining list
   if (currentList !== null) {
     result.push(`</${listType}>`);
   }
-  
+
   return result.join('\n');
 };
 
-const processSlideContent = (content) => {
+const processSlideContent = content => {
   const codeBlocks = [];
   const speakerNotes = [];
   let codeIndex = 0;
   let notesIndex = 0;
-  
+
   // Extract and placeholder speaker notes first
-  content = content.replace(/<aside class="notes">([\s\S]*?)<\/aside>/g, (match, noteContent) => {
-    const placeholder = `__SPEAKER_NOTE_${notesIndex}__`;
-    speakerNotes[notesIndex] = `<aside class="notes">${noteContent.trim()}</aside>`;
-    notesIndex++;
-    return placeholder;
-  });
-  
-  // Extract and placeholder code blocks
-  content = content.replace(/```(\w+)?\s*\{([^}]+)\}\s*\n([\s\S]*?)```/g, (match, lang, attrs, code) => {
-    const placeholder = `__CODE_BLOCK_${codeIndex}__`;
-    if (attrs.includes('data-id')) {
-      codeBlocks[codeIndex] = `<pre ${attrs}><code class="language-${lang || ''}" data-trim data-line-numbers>${code.trim()}</code></pre>`;
-    } else {
-      codeBlocks[codeIndex] = `<pre><code class="language-${lang || ''}" ${attrs} data-trim>${code.trim()}</code></pre>`;
+  content = content.replace(
+    /<aside class="notes">([\s\S]*?)<\/aside>/g,
+    (match, noteContent) => {
+      const placeholder = `__SPEAKER_NOTE_${notesIndex}__`;
+      speakerNotes[notesIndex] =
+        `<aside class="notes">${noteContent.trim()}</aside>`;
+      notesIndex++;
+      return placeholder;
     }
-    codeIndex++;
-    return placeholder;
-  });
-  
-  content = content.replace(/```(\w+)?\s*\n([\s\S]*?)```/g, (match, lang, code) => {
-    const placeholder = `__CODE_BLOCK_${codeIndex}__`;
-    codeBlocks[codeIndex] = `<pre><code class="language-${lang || ''}" data-trim>${code.trim()}</code></pre>`;
-    codeIndex++;
-    return placeholder;
-  });
-  
+  );
+
+  // Extract and placeholder code blocks
+  content = content.replace(
+    /```(\w+)?\s*\{([^}]+)\}\s*\n([\s\S]*?)```/g,
+    (match, lang, attrs, code) => {
+      const placeholder = `__CODE_BLOCK_${codeIndex}__`;
+      if (attrs.includes('data-id')) {
+        codeBlocks[codeIndex] =
+          `<pre ${attrs}><code class="language-${lang || ''}" data-trim data-line-numbers>${code.trim()}</code></pre>`;
+      } else {
+        codeBlocks[codeIndex] =
+          `<pre><code class="language-${lang || ''}" ${attrs} data-trim>${code.trim()}</code></pre>`;
+      }
+      codeIndex++;
+      return placeholder;
+    }
+  );
+
+  content = content.replace(
+    /```(\w+)?\s*\n([\s\S]*?)```/g,
+    (match, lang, code) => {
+      const placeholder = `__CODE_BLOCK_${codeIndex}__`;
+      codeBlocks[codeIndex] =
+        `<pre><code class="language-${lang || ''}" data-trim>${code.trim()}</code></pre>`;
+      codeIndex++;
+      return placeholder;
+    }
+  );
+
   // Process markdown elements
   let processed = content
     .replace(/^###### (.*?)\s*\{([^}]+)\}/gm, '<h6 $2>$1</h6>')
@@ -349,53 +362,62 @@ const processSlideContent = (content) => {
     .map(line => line.trim())
     .filter(line => line)
     .map(line => {
-      if (line.match(/^<[^>]+>/) || line.match(/^__CODE_BLOCK_\d+__$/) || line.match(/^__SPEAKER_NOTE_\d+__$/) || line.match(/<\/[^>]+>$/)) {
+      if (
+        line.match(/^<[^>]+>/) ||
+        line.match(/^__CODE_BLOCK_\d+__$/) ||
+        line.match(/^__SPEAKER_NOTE_\d+__$/) ||
+        line.match(/<\/[^>]+>$/)
+      ) {
         return line;
       } else if (!line.match(/^<\/?\w+/)) {
         return `<p>${line}</p>`;
       }
       return line;
     });
-  
+
   processed = processedLines.join('\n');
-  
+
   // Restore code blocks
   codeBlocks.forEach((block, index) => {
     processed = processed.replace(`__CODE_BLOCK_${index}__`, block);
   });
-  
+
   // Restore speaker notes
   speakerNotes.forEach((note, index) => {
     processed = processed.replace(`__SPEAKER_NOTE_${index}__`, note);
   });
-  
+
   return processed;
 };
 
-const convertMarkdownToSlides = (markdown) => {
+const convertMarkdownToSlides = markdown => {
   const horizontalSlides = markdown.split(/\n---\n/);
-  
+
   const sections = horizontalSlides.map(horizontalSlide => {
     const verticalSlides = horizontalSlide.split(/\n--\n/);
-    
+
     if (verticalSlides.length > 1) {
-      const verticalSections = verticalSlides.map(slide => {
-        const { content, attributes } = extractSlideAttributes(slide.trim());
-        return `            <section${attributes}>
+      const verticalSections = verticalSlides
+        .map(slide => {
+          const { content, attributes } = extractSlideAttributes(slide.trim());
+          return `            <section${attributes}>
                 ${processSlideContent(content)}
             </section>`;
-      }).join('\n');
+        })
+        .join('\n');
       return `        <section>
 ${verticalSections}
         </section>`;
     } else {
-      const { content, attributes } = extractSlideAttributes(horizontalSlide.trim());
+      const { content, attributes } = extractSlideAttributes(
+        horizontalSlide.trim()
+      );
       return `            <section${attributes}>
                 ${processSlideContent(content)}
             </section>`;
     }
   });
-  
+
   return sections.join('\n');
 };
 
@@ -403,9 +425,9 @@ ${verticalSections}
 const ThemeSelector = ({ value, onChange }) => (
   <div>
     <label className="text-sm font-medium text-text-secondary">Theme</label>
-    <select 
-      value={value} 
-      onChange={(e) => onChange(e.target.value)}
+    <select
+      value={value}
+      onChange={e => onChange(e.target.value)}
       className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-border focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md bg-surface"
       aria-label="Select presentation theme"
     >
@@ -420,10 +442,12 @@ const ThemeSelector = ({ value, onChange }) => (
 
 const TransitionSelector = ({ value, onChange }) => (
   <div>
-    <label className="text-sm font-medium text-text-secondary">Transition</label>
-    <select 
-      value={value} 
-      onChange={(e) => onChange(e.target.value)}
+    <label className="text-sm font-medium text-text-secondary">
+      Transition
+    </label>
+    <select
+      value={value}
+      onChange={e => onChange(e.target.value)}
       className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-border focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md bg-surface"
       aria-label="Select slide transition"
     >
@@ -446,8 +470,17 @@ const ProTipsSection = () => {
         className="w-full flex items-center justify-between text-sm font-semibold text-text-primary"
       >
         <span>Pro Tips & Best Practices</span>
-        <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 transition-transform ${isExpanded ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className={`h-5 w-5 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fillRule="evenodd"
+            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+            clipRule="evenodd"
+          />
         </svg>
       </button>
       {isExpanded && (
@@ -463,17 +496,35 @@ const ProTipsSection = () => {
             </li>
             <li className="flex items-start gap-2">
               <span className="text-primary mt-0.5">•</span>
-              <span>Press <kbd className="px-1.5 py-0.5 font-sans rounded bg-border text-text-primary">S</kbd> for speaker view</span>
+              <span>
+                Press{' '}
+                <kbd className="px-1.5 py-0.5 font-sans rounded bg-border text-text-primary">
+                  S
+                </kbd>{' '}
+                for speaker view
+              </span>
             </li>
           </ul>
           <ul className="space-y-2 text-xs text-text-secondary">
             <li className="flex items-start gap-2">
               <span className="text-primary mt-0.5">•</span>
-              <span>Vertical slides (<code className="px-1.5 py-0.5 font-sans rounded bg-border text-text-primary">--</code>) create sub-sections</span>
+              <span>
+                Vertical slides (
+                <code className="px-1.5 py-0.5 font-sans rounded bg-border text-text-primary">
+                  --
+                </code>
+                ) create sub-sections
+              </span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-primary mt-0.5">•</span>
-              <span>Use same <code className="px-1.5 py-0.5 font-sans rounded bg-border text-text-primary">data-id</code> for smooth animations</span>
+              <span>
+                Use same{' '}
+                <code className="px-1.5 py-0.5 font-sans rounded bg-border text-text-primary">
+                  data-id
+                </code>{' '}
+                for smooth animations
+              </span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-primary mt-0.5">•</span>
@@ -483,8 +534,8 @@ const ProTipsSection = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
 const DocumentationSection = () => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -582,17 +633,20 @@ function hello() {
 - Test navigation with arrow keys before presenting
 - Download HTML for offline presenting`;
 
-    navigator.clipboard.writeText(aiDoc).then(() => {
-      alert('📋 AI-friendly documentation copied to clipboard!');
-    }).catch(() => {
-      const textArea = document.createElement('textarea');
-      textArea.value = aiDoc;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-      alert('📋 AI-friendly documentation copied to clipboard!');
-    });
+    navigator.clipboard
+      .writeText(aiDoc)
+      .then(() => {
+        alert('📋 AI-friendly documentation copied to clipboard!');
+      })
+      .catch(() => {
+        const textArea = document.createElement('textarea');
+        textArea.value = aiDoc;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        alert('📋 AI-friendly documentation copied to clipboard!');
+      });
   };
 
   return (
@@ -603,8 +657,17 @@ function hello() {
           className="flex-grow flex items-center justify-between text-sm font-semibold text-text-primary"
         >
           <span>Full Documentation</span>
-          <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 transition-transform ${isExpanded ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className={`h-5 w-5 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+              clipRule="evenodd"
+            />
           </svg>
         </button>
         <button
@@ -612,13 +675,24 @@ function hello() {
           className="ml-4 px-3 py-1 bg-primary/10 text-primary rounded-md hover:bg-primary/20 text-xs font-semibold transition-colors flex items-center gap-2 flex-shrink-0"
           title="Copy documentation in AI-friendly format"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m-6 4h6m-6 4h6m-6 4h6" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m-6 4h6m-6 4h6m-6 4h6"
+            />
           </svg>
           <span>Copy for AI</span>
         </button>
       </div>
-      
+
       {isExpanded && (
         <div className="mt-4 space-y-4 text-xs text-text-secondary">
           {/* Basic Markdown Section */}
@@ -629,66 +703,94 @@ function hello() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
               <div className="space-y-2">
                 <div className="bg-sidebar rounded p-2 border border-border">
-                  <h5 className="font-semibold text-text-primary mb-1.5 text-sm">Slide Navigation</h5>
+                  <h5 className="font-semibold text-text-primary mb-1.5 text-sm">
+                    Slide Navigation
+                  </h5>
                   <div className="space-y-1">
                     <div className="flex items-center justify-between py-1">
-                      <code className="bg-primary/10 text-primary px-2 py-0.5 rounded font-mono">---</code>
+                      <code className="bg-primary/10 text-primary px-2 py-0.5 rounded font-mono">
+                        ---
+                      </code>
                       <span>New horizontal slide</span>
                     </div>
                     <div className="flex items-center justify-between py-1">
-                      <code className="bg-primary/10 text-primary px-2 py-0.5 rounded font-mono">--</code>
+                      <code className="bg-primary/10 text-primary px-2 py-0.5 rounded font-mono">
+                        --
+                      </code>
                       <span>New vertical slide</span>
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="bg-sidebar rounded p-2 border border-border">
-                  <h5 className="font-semibold text-text-primary mb-1.5 text-sm">Text Formatting</h5>
+                  <h5 className="font-semibold text-text-primary mb-1.5 text-sm">
+                    Text Formatting
+                  </h5>
                   <div className="space-y-1">
                     <div className="flex items-center justify-between py-1">
-                      <code className="bg-primary/10 text-primary px-2 py-0.5 rounded font-mono">**bold**</code>
+                      <code className="bg-primary/10 text-primary px-2 py-0.5 rounded font-mono">
+                        **bold**
+                      </code>
                       <span>Bold text</span>
                     </div>
                     <div className="flex items-center justify-between py-1">
-                      <code className="bg-primary/10 text-primary px-2 py-0.5 rounded font-mono">*italic*</code>
+                      <code className="bg-primary/10 text-primary px-2 py-0.5 rounded font-mono">
+                        *italic*
+                      </code>
                       <span>Italic text</span>
                     </div>
                     <div className="flex items-center justify-between py-1">
-                      <code className="bg-primary/10 text-primary px-2 py-0.5 rounded font-mono">`code`</code>
+                      <code className="bg-primary/10 text-primary px-2 py-0.5 rounded font-mono">
+                        `code`
+                      </code>
                       <span>Inline code</span>
                     </div>
                   </div>
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <div className="bg-sidebar rounded p-2 border border-border">
-                  <h5 className="font-semibold text-text-primary mb-1.5 text-sm">Headers & Lists</h5>
+                  <h5 className="font-semibold text-text-primary mb-1.5 text-sm">
+                    Headers & Lists
+                  </h5>
                   <div className="space-y-1">
                     <div className="flex items-center justify-between py-1">
-                      <code className="bg-primary/10 text-primary px-3 py-1 rounded font-mono"># ## ###</code>
+                      <code className="bg-primary/10 text-primary px-3 py-1 rounded font-mono">
+                        # ## ###
+                      </code>
                       <span>Headers (h1-h6)</span>
                     </div>
                     <div className="flex items-center justify-between py-1">
-                      <code className="bg-primary/10 text-primary px-3 py-1 rounded font-mono">- * +</code>
+                      <code className="bg-primary/10 text-primary px-3 py-1 rounded font-mono">
+                        - * +
+                      </code>
                       <span>Bullet lists</span>
                     </div>
                     <div className="flex items-center justify-between py-1">
-                      <code className="bg-primary/10 text-primary px-3 py-1 rounded font-mono">1. 2. 3.</code>
+                      <code className="bg-primary/10 text-primary px-3 py-1 rounded font-mono">
+                        1. 2. 3.
+                      </code>
                       <span>Numbered lists</span>
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="bg-sidebar rounded p-2 border border-border">
-                  <h5 className="font-semibold text-text-primary mb-1.5 text-sm">Links & Images</h5>
+                  <h5 className="font-semibold text-text-primary mb-1.5 text-sm">
+                    Links & Images
+                  </h5>
                   <div className="space-y-1">
                     <div className="py-1">
-                      <code className="bg-primary/10 text-primary px-3 py-1 rounded font-mono block mb-1">[text](url)</code>
+                      <code className="bg-primary/10 text-primary px-3 py-1 rounded font-mono block mb-1">
+                        [text](url)
+                      </code>
                       <span>Clickable links</span>
                     </div>
                     <div className="py-1">
-                      <code className="bg-primary/10 text-primary px-3 py-1 rounded font-mono block mb-1">![alt](image.jpg)</code>
+                      <code className="bg-primary/10 text-primary px-3 py-1 rounded font-mono block mb-1">
+                        ![alt](image.jpg)
+                      </code>
                       <span>Embedded images</span>
                     </div>
                   </div>
@@ -707,28 +809,38 @@ function hello() {
                 <h5 className="font-semibold text-text-primary mb-2 flex items-center gap-2">
                   ✨ Auto-Animate Slides
                 </h5>
-                <p className="text-xs text-text-secondary mb-3">Create smooth transitions between slides with matching elements.</p>
+                <p className="text-xs text-text-secondary mb-3">
+                  Create smooth transitions between slides with matching
+                  elements.
+                </p>
                 <div className="space-y-3">
                   <div>
-                    <p className="text-xs font-semibold text-text-primary mb-1">Enable auto-animate:</p>
+                    <p className="text-xs font-semibold text-text-primary mb-1">
+                      Enable auto-animate:
+                    </p>
                     <code className="bg-background text-text-primary px-3 py-2 rounded block font-mono w-full text-left">
                       {`## My Title {data-auto-animate}\n\n# Element {data-id="unique"}`}
                     </code>
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-text-primary mb-1">Next slide (same data-id):</p>
+                    <p className="text-xs font-semibold text-text-primary mb-1">
+                      Next slide (same data-id):
+                    </p>
                     <code className="bg-background text-text-primary px-3 py-2 rounded block font-mono w-full text-left">
                       {`## My Title {data-auto-animate}\n\n# Element {data-id="unique"}`}
                     </code>
                   </div>
                 </div>
               </div>
-              
+
               <div className="bg-sidebar rounded-lg p-3 border border-border">
                 <h5 className="font-semibold text-text-primary mb-2 flex items-center gap-2">
                   🎤 Speaker Notes
                 </h5>
-                <p className="text-xs text-text-secondary mb-3">Add private notes visible only in speaker view (press 'S' in downloaded HTML).</p>
+                <p className="text-xs text-text-secondary mb-3">
+                  Add private notes visible only in speaker view (press 'S' in
+                  downloaded HTML).
+                </p>
                 <div className="space-y-2">
                   <code className="bg-background text-text-primary px-3 py-2 rounded block font-mono w-full text-left">
                     {`<aside class="notes">\n  Private speaker notes\n</aside>`}
@@ -748,13 +860,13 @@ const RevealJSGenerator = () => {
   const [selectedTheme, setSelectedTheme] = useState('black');
   const [selectedTransition, setSelectedTransition] = useState('slide');
   const [isDownloading, setIsDownloading] = useState(false);
-  
+
   const previewIframeRef = useRef(null);
 
   // Memoized presentation HTML to prevent unnecessary recalculation
   const presentationHTML = useMemo(() => {
     const slidesHtml = convertMarkdownToSlides(markdownInput);
-    
+
     return `<!DOCTYPE html>
 <html>
 <head>
@@ -809,24 +921,27 @@ const RevealJSGenerator = () => {
   }, [markdownInput, selectedTheme, selectedTransition]);
 
   // Memoized CDN URLs to prevent recalculation
-  const cdnUrls = useMemo(() => ({
-    revealCSS: `${CDN_BASE_URL}/reveal.min.css`,
-    themeCSS: `${CDN_BASE_URL}/theme/${selectedTheme}.min.css`,
-    highlightCSS: `${CDN_BASE_URL}/plugin/highlight/zenburn.min.css`,
-    revealJS: `${CDN_BASE_URL}/reveal.min.js`,
-    highlightJS: `${CDN_BASE_URL}/plugin/highlight/highlight.min.js`,
-    notesJS: `${CDN_BASE_URL}/plugin/notes/notes.min.js`
-  }), [selectedTheme]);
+  const cdnUrls = useMemo(
+    () => ({
+      revealCSS: `${CDN_BASE_URL}/reveal.min.css`,
+      themeCSS: `${CDN_BASE_URL}/theme/${selectedTheme}.min.css`,
+      highlightCSS: `${CDN_BASE_URL}/plugin/highlight/zenburn.min.css`,
+      revealJS: `${CDN_BASE_URL}/reveal.min.js`,
+      highlightJS: `${CDN_BASE_URL}/plugin/highlight/highlight.min.js`,
+      notesJS: `${CDN_BASE_URL}/plugin/notes/notes.min.js`,
+    }),
+    [selectedTheme]
+  );
 
-  const handleMarkdownChange = useCallback((event) => {
+  const handleMarkdownChange = useCallback(event => {
     setMarkdownInput(event.target.value);
   }, []);
 
   const downloadOfflinePresentation = useCallback(async () => {
     if (isDownloading) return;
-    
+
     setIsDownloading(true);
-    
+
     try {
       const responses = await Promise.all([
         fetch(cdnUrls.revealCSS),
@@ -834,16 +949,21 @@ const RevealJSGenerator = () => {
         fetch(cdnUrls.highlightCSS),
         fetch(cdnUrls.revealJS),
         fetch(cdnUrls.highlightJS),
-        fetch(cdnUrls.notesJS)
+        fetch(cdnUrls.notesJS),
       ]);
 
-      const [revealCSS, themeCSS, highlightCSS, revealJS, highlightJS, notesJS] = await Promise.all(
-        responses.map(r => r.text())
-      );
+      const [
+        revealCSS,
+        themeCSS,
+        highlightCSS,
+        revealJS,
+        highlightJS,
+        notesJS,
+      ] = await Promise.all(responses.map(r => r.text()));
 
       const slidesHtml = convertMarkdownToSlides(markdownInput);
       const filename = extractTitleFromMarkdown(markdownInput);
-      
+
       const embeddedHTML = `<!DOCTYPE html>
 <html>
 <head>
@@ -916,7 +1036,6 @@ ${notesJS}
       downloadLink.download = `${filename}.html`;
       downloadLink.click();
       URL.revokeObjectURL(url);
-      
     } catch (error) {
       console.error('Error downloading presentation:', error);
       alert('Error creating offline presentation. Please try again.');
@@ -929,21 +1048,22 @@ ${notesJS}
     <div className="flex flex-col lg:flex-row h-screen bg-background font-sans">
       {/* Sidebar */}
       <aside className="w-full lg:w-1/2 h-1/2 lg:h-full flex flex-col bg-sidebar p-4 border-r border-border">
-        <h1 className="text-xl font-bold text-text-primary mb-4">Markslide Studio</h1>
-        
+        <h1 className="text-xl font-bold text-text-primary mb-4">
+          Markslide Studio
+        </h1>
+
         <div className="flex items-center justify-between mb-4">
           <div className="flex gap-4">
-            <ThemeSelector 
-              value={selectedTheme} 
-              onChange={setSelectedTheme} 
-            />
-            <TransitionSelector 
-              value={selectedTransition} 
-              onChange={setSelectedTransition} 
+            <ThemeSelector value={selectedTheme} onChange={setSelectedTheme} />
+            <TransitionSelector
+              value={selectedTransition}
+              onChange={setSelectedTransition}
             />
             <div>
-              <label className="text-sm font-medium text-transparent select-none">Download</label>
-              <button 
+              <label className="text-sm font-medium text-transparent select-none">
+                Download
+              </label>
+              <button
                 onClick={downloadOfflinePresentation}
                 disabled={isDownloading}
                 className="mt-1 px-4 py-2 bg-surface border border-border text-text-primary rounded-md hover:bg-background disabled:opacity-50 text-sm font-semibold transition-colors flex items-center gap-2"
@@ -956,8 +1076,19 @@ ${notesJS}
                   </>
                 ) : (
                   <>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                      />
                     </svg>
                     <span>Download</span>
                   </>
@@ -976,7 +1107,7 @@ ${notesJS}
             aria-label="Markdown input for presentation content"
           />
         </div>
-        
+
         <div className="space-y-2 mt-4 overflow-y-auto">
           <ProTipsSection />
           <DocumentationSection />
