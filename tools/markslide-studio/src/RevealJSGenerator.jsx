@@ -401,12 +401,12 @@ ${verticalSections}
 
 // Component subcomponents
 const ThemeSelector = ({ value, onChange }) => (
-  <div className="flex flex-col gap-1">
-    <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Theme</label>
+  <div>
+    <label className="text-sm font-medium text-text-secondary">Theme</label>
     <select 
       value={value} 
       onChange={(e) => onChange(e.target.value)}
-      className="px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white shadow-sm hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+      className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-border focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md bg-surface"
       aria-label="Select presentation theme"
     >
       {THEME_OPTIONS.map(theme => (
@@ -419,12 +419,12 @@ const ThemeSelector = ({ value, onChange }) => (
 );
 
 const TransitionSelector = ({ value, onChange }) => (
-  <div className="flex flex-col gap-1">
-    <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Transition</label>
+  <div>
+    <label className="text-sm font-medium text-text-secondary">Transition</label>
     <select 
       value={value} 
       onChange={(e) => onChange(e.target.value)}
-      className="px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white shadow-sm hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+      className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-border focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md bg-surface"
       aria-label="Select slide transition"
     >
       {TRANSITION_OPTIONS.map(transition => (
@@ -436,7 +436,58 @@ const TransitionSelector = ({ value, onChange }) => (
   </div>
 );
 
+const ProTipsSection = () => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <div className="mt-2 p-3 bg-surface border border-border rounded-md">
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="w-full flex items-center justify-between text-sm font-semibold text-text-primary"
+      >
+        <span>Pro Tips & Best Practices</span>
+        <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 transition-transform ${isExpanded ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor">
+          <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+        </svg>
+      </button>
+      {isExpanded && (
+        <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <ul className="space-y-2 text-xs text-text-secondary">
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-0.5">•</span>
+              <span>Arrow keys navigate: ← → ↑ ↓</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-0.5">•</span>
+              <span>Downloaded HTML works offline</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-0.5">•</span>
+              <span>Press <kbd className="px-1.5 py-0.5 font-sans rounded bg-border text-text-primary">S</kbd> for speaker view</span>
+            </li>
+          </ul>
+          <ul className="space-y-2 text-xs text-text-secondary">
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-0.5">•</span>
+              <span>Vertical slides (<code className="px-1.5 py-0.5 font-sans rounded bg-border text-text-primary">--</code>) create sub-sections</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-0.5">•</span>
+              <span>Use same <code className="px-1.5 py-0.5 font-sans rounded bg-border text-text-primary">data-id</code> for smooth animations</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-primary mt-0.5">•</span>
+              <span>Full Unicode support: 🌍 中文 العربية</span>
+            </li>
+          </ul>
+        </div>
+      )}
+    </div>
+  )
+}
+
 const DocumentationSection = () => {
+  const [isExpanded, setIsExpanded] = useState(false);
   const copyAIDocumentation = () => {
     const aiDoc = `# MarkSlide Studio - AI Documentation
 
@@ -496,21 +547,17 @@ Access: Press 'S' in downloaded HTML to open speaker view.
 
 ### Code Presentations
 Basic code blocks:
-\`\`\`markdown
-\\\`\\\`\\\`javascript
+\`\`\`javascript
 function hello() {
   return "Hello World!";
 }
-\\\`\\\`\\\`
 \`\`\`
 
 Animated code (for code evolution demos):
-\`\`\`markdown
-\\\`\\\`\\\`javascript {data-id="code"}
+\`\`\`javascript {data-id="code"}
 function hello() {
   return "Hello!";
 }
-\\\`\\\`\\\`
 \`\`\`
 
 ## Usage Instructions
@@ -536,9 +583,8 @@ function hello() {
 - Download HTML for offline presenting`;
 
     navigator.clipboard.writeText(aiDoc).then(() => {
-      alert('📋 AI-friendly documentation copied to clipboard!\n\nThis format is optimized for AI assistants to understand MarkSlide Studio features.');
+      alert('📋 AI-friendly documentation copied to clipboard!');
     }).catch(() => {
-      // Fallback for older browsers
       const textArea = document.createElement('textarea');
       textArea.value = aiDoc;
       document.body.appendChild(textArea);
@@ -550,228 +596,150 @@ function hello() {
   };
 
   return (
-  <div className="mt-6 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-            📖 Complete Feature Documentation
-          </h3>
-          <p className="text-sm text-gray-600 mt-1">Everything you need to create professional presentations</p>
-        </div>
+    <div className="mt-4 p-3 bg-surface border border-border rounded-md">
+      <div className="flex items-center justify-between">
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="flex-grow flex items-center justify-between text-sm font-semibold text-text-primary"
+        >
+          <span>Full Documentation</span>
+          <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 transition-transform ${isExpanded ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+          </svg>
+        </button>
         <button
           onClick={copyAIDocumentation}
-          className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 text-sm font-semibold transition-all shadow-md hover:shadow-lg transform hover:scale-105 flex items-center gap-2 whitespace-nowrap"
+          className="ml-4 px-3 py-1 bg-primary/10 text-primary rounded-md hover:bg-primary/20 text-xs font-semibold transition-colors flex items-center gap-2 flex-shrink-0"
           title="Copy documentation in AI-friendly format"
         >
-          🤖 Copy for AI
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m-6 4h6m-6 4h6m-6 4h6" />
+          </svg>
+          <span>Copy for AI</span>
         </button>
       </div>
+      
+      {isExpanded && (
+        <div className="mt-4 space-y-4 text-xs text-text-secondary">
+          {/* Basic Markdown Section */}
+          <div>
+            <h4 className="text-sm font-semibold text-text-primary mb-2">
+              Markdown Syntax
+            </h4>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <div className="bg-sidebar rounded p-2 border border-border">
+                  <h5 className="font-semibold text-text-primary mb-1.5 text-sm">Slide Navigation</h5>
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between py-1">
+                      <code className="bg-primary/10 text-primary px-2 py-0.5 rounded font-mono">---</code>
+                      <span>New horizontal slide</span>
+                    </div>
+                    <div className="flex items-center justify-between py-1">
+                      <code className="bg-primary/10 text-primary px-2 py-0.5 rounded font-mono">--</code>
+                      <span>New vertical slide</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-sidebar rounded p-2 border border-border">
+                  <h5 className="font-semibold text-text-primary mb-1.5 text-sm">Text Formatting</h5>
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between py-1">
+                      <code className="bg-primary/10 text-primary px-2 py-0.5 rounded font-mono">**bold**</code>
+                      <span>Bold text</span>
+                    </div>
+                    <div className="flex items-center justify-between py-1">
+                      <code className="bg-primary/10 text-primary px-2 py-0.5 rounded font-mono">*italic*</code>
+                      <span>Italic text</span>
+                    </div>
+                    <div className="flex items-center justify-between py-1">
+                      <code className="bg-primary/10 text-primary px-2 py-0.5 rounded font-mono">`code`</code>
+                      <span>Inline code</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="bg-sidebar rounded p-2 border border-border">
+                  <h5 className="font-semibold text-text-primary mb-1.5 text-sm">Headers & Lists</h5>
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between py-1">
+                      <code className="bg-primary/10 text-primary px-3 py-1 rounded font-mono"># ## ###</code>
+                      <span>Headers (h1-h6)</span>
+                    </div>
+                    <div className="flex items-center justify-between py-1">
+                      <code className="bg-primary/10 text-primary px-3 py-1 rounded font-mono">- * +</code>
+                      <span>Bullet lists</span>
+                    </div>
+                    <div className="flex items-center justify-between py-1">
+                      <code className="bg-primary/10 text-primary px-3 py-1 rounded font-mono">1. 2. 3.</code>
+                      <span>Numbered lists</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-sidebar rounded p-2 border border-border">
+                  <h5 className="font-semibold text-text-primary mb-1.5 text-sm">Links & Images</h5>
+                  <div className="space-y-1">
+                    <div className="py-1">
+                      <code className="bg-primary/10 text-primary px-3 py-1 rounded font-mono block mb-1">[text](url)</code>
+                      <span>Clickable links</span>
+                    </div>
+                    <div className="py-1">
+                      <code className="bg-primary/10 text-primary px-3 py-1 rounded font-mono block mb-1">![alt](image.jpg)</code>
+                      <span>Embedded images</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Advanced Features Section */}
+          <div className="border-t border-border pt-4">
+            <h4 className="text-sm font-semibold text-text-primary mb-3">
+              Advanced Features
+            </h4>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="bg-sidebar rounded-lg p-3 border border-border">
+                <h5 className="font-semibold text-text-primary mb-2 flex items-center gap-2">
+                  ✨ Auto-Animate Slides
+                </h5>
+                <p className="text-xs text-text-secondary mb-3">Create smooth transitions between slides with matching elements.</p>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-xs font-semibold text-text-primary mb-1">Enable auto-animate:</p>
+                    <code className="bg-background text-text-primary px-3 py-2 rounded block font-mono w-full text-left">
+                      {`## My Title {data-auto-animate}\n\n# Element {data-id="unique"}`}
+                    </code>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-text-primary mb-1">Next slide (same data-id):</p>
+                    <code className="bg-background text-text-primary px-3 py-2 rounded block font-mono w-full text-left">
+                      {`## My Title {data-auto-animate}\n\n# Element {data-id="unique"}`}
+                    </code>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-sidebar rounded-lg p-3 border border-border">
+                <h5 className="font-semibold text-text-primary mb-2 flex items-center gap-2">
+                  🎤 Speaker Notes
+                </h5>
+                <p className="text-xs text-text-secondary mb-3">Add private notes visible only in speaker view (press 'S' in downloaded HTML).</p>
+                <div className="space-y-2">
+                  <code className="bg-background text-text-primary px-3 py-2 rounded block font-mono w-full text-left">
+                    {`<aside class="notes">\n  Private speaker notes\n</aside>`}
+                  </code>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
-    
-    <div className="p-6 space-y-8">
-      {/* Basic Markdown Section */}
-      <div>
-        <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-          ✍️ Markdown Syntax
-        </h4>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="space-y-3">
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h5 className="font-semibold text-gray-800 mb-3">Slide Navigation</h5>
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center justify-between py-1">
-                  <code className="bg-blue-100 text-blue-800 px-3 py-1 rounded font-mono text-xs">---</code>
-                  <span className="text-gray-600">New horizontal slide</span>
-                </div>
-                <div className="flex items-center justify-between py-1">
-                  <code className="bg-blue-100 text-blue-800 px-3 py-1 rounded font-mono text-xs">--</code>
-                  <span className="text-gray-600">New vertical slide</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h5 className="font-semibold text-gray-800 mb-3">Text Formatting</h5>
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center justify-between py-1">
-                  <code className="bg-green-100 text-green-800 px-3 py-1 rounded font-mono text-xs">**bold**</code>
-                  <span className="text-gray-600">Bold text</span>
-                </div>
-                <div className="flex items-center justify-between py-1">
-                  <code className="bg-green-100 text-green-800 px-3 py-1 rounded font-mono text-xs">*italic*</code>
-                  <span className="text-gray-600">Italic text</span>
-                </div>
-                <div className="flex items-center justify-between py-1">
-                  <code className="bg-green-100 text-green-800 px-3 py-1 rounded font-mono text-xs">`code`</code>
-                  <span className="text-gray-600">Inline code</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="space-y-3">
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h5 className="font-semibold text-gray-800 mb-3">Headers & Lists</h5>
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center justify-between py-1">
-                  <code className="bg-purple-100 text-purple-800 px-3 py-1 rounded font-mono text-xs"># ## ###</code>
-                  <span className="text-gray-600">Headers (h1-h6)</span>
-                </div>
-                <div className="flex items-center justify-between py-1">
-                  <code className="bg-purple-100 text-purple-800 px-3 py-1 rounded font-mono text-xs">- * +</code>
-                  <span className="text-gray-600">Bullet lists</span>
-                </div>
-                <div className="flex items-center justify-between py-1">
-                  <code className="bg-purple-100 text-purple-800 px-3 py-1 rounded font-mono text-xs">1. 2. 3.</code>
-                  <span className="text-gray-600">Numbered lists</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h5 className="font-semibold text-gray-800 mb-3">Links & Images</h5>
-              <div className="space-y-2 text-sm">
-                <div className="py-1">
-                  <code className="bg-orange-100 text-orange-800 px-3 py-1 rounded font-mono text-xs block mb-1">[text](url)</code>
-                  <span className="text-gray-600 text-xs">Clickable links</span>
-                </div>
-                <div className="py-1">
-                  <code className="bg-orange-100 text-orange-800 px-3 py-1 rounded font-mono text-xs block mb-1">![alt](image.jpg)</code>
-                  <span className="text-gray-600 text-xs">Embedded images</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Advanced Features Section */}
-      <div className="border-t border-gray-200 pt-6">
-        <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-          🎬 Advanced Features
-        </h4>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-blue-50 rounded-lg p-5">
-            <h5 className="font-bold text-blue-900 mb-3 flex items-center gap-2">
-              ✨ Auto-Animate Slides
-            </h5>
-            <p className="text-sm text-blue-800 mb-3">Create smooth transitions between slides with matching elements.</p>
-            <div className="space-y-3">
-              <div>
-                <p className="text-xs font-semibold text-blue-800 mb-1">Enable auto-animate:</p>
-                <code className="bg-blue-200 text-blue-900 px-3 py-2 rounded block text-xs font-mono">
-                  {`## My Title {data-auto-animate}
-
-# Moving Element {data-id="unique"}
-Content here`}
-                </code>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-blue-800 mb-1">Next slide (same data-id):</p>
-                <code className="bg-blue-200 text-blue-900 px-3 py-2 rounded block text-xs font-mono">
-                  {`## My Title {data-auto-animate}
-
-# Moving Element {data-id="unique" style="color: red;"}
-New content!`}
-                </code>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-green-50 rounded-lg p-5">
-            <h5 className="font-bold text-green-900 mb-3 flex items-center gap-2">
-              🎤 Speaker Notes
-            </h5>
-            <p className="text-sm text-green-800 mb-3">Add private notes visible only in speaker view (press 'S' in downloaded HTML).</p>
-            <div className="space-y-2">
-              <code className="bg-green-200 text-green-900 px-3 py-2 rounded block text-xs font-mono">
-                {`## My Slide
-
-Visible content here
-
-<aside class="notes">
-  Private speaker notes
-  • Key talking points
-  • Reminders
-</aside>`}
-              </code>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Code Blocks Section */}
-      <div className="border-t border-gray-200 pt-6">
-        <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-          💻 Code Presentations
-        </h4>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-gray-50 rounded-lg p-5">
-            <h5 className="font-semibold text-gray-800 mb-3">Basic Code Blocks</h5>
-            <code className="bg-gray-200 text-gray-800 px-3 py-2 rounded block text-xs font-mono whitespace-pre">
-              {`\`\`\`javascript
-function hello() {
-  return "Hello World!";
-}
-\`\`\``}
-            </code>
-          </div>
-          
-          <div className="bg-gray-50 rounded-lg p-5">
-            <h5 className="font-semibold text-gray-800 mb-3">Animated Code</h5>
-            <code className="bg-gray-200 text-gray-800 px-3 py-2 rounded block text-xs font-mono whitespace-pre">
-              {`\`\`\`javascript {data-id="code"}
-function hello() {
-  return "Hello!";
-}
-\`\`\``}
-            </code>
-            <p className="text-xs text-gray-600 mt-2">Use same data-id across slides for smooth code evolution</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Pro Tips Section */}
-      <div className="border-t border-gray-200 pt-6">
-        <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-l-4 border-yellow-400 rounded-r-lg p-5">
-          <h4 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
-            💡 Pro Tips & Best Practices
-          </h4>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <ul className="space-y-2 text-sm text-gray-700">
-              <li className="flex items-start gap-2">
-                <span className="text-yellow-600 mt-0.5">▶</span>
-                <span>Use the same <code className="bg-yellow-100 px-1 rounded text-xs">data-id</code> across consecutive slides for smooth animations</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-yellow-600 mt-0.5">▶</span>
-                <span>Vertical slides (<code className="bg-yellow-100 px-1 rounded text-xs">--</code>) create detailed sub-sections</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-yellow-600 mt-0.5">▶</span>
-                <span>Press <kbd className="bg-gray-100 px-2 py-1 rounded text-xs border">S</kbd> in downloaded HTML for speaker view</span>
-              </li>
-            </ul>
-            <ul className="space-y-2 text-sm text-gray-700">
-              <li className="flex items-start gap-2">
-                <span className="text-yellow-600 mt-0.5">▶</span>
-                <span>Full Unicode support: 🌍 中文 العربية ñ математика</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-yellow-600 mt-0.5">▶</span>
-                <span>Downloaded HTML works offline with all features intact</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-yellow-600 mt-0.5">▶</span>
-                <span>Use arrow keys to navigate: ← → ↑ ↓</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
   );
 };
 
@@ -792,10 +760,10 @@ const RevealJSGenerator = () => {
 <head>
     <link rel="stylesheet" href="${CDN_BASE_URL}/reveal.min.css">
     <link rel="stylesheet" href="${CDN_BASE_URL}/theme/${selectedTheme}.min.css">
-    <link rel="stylesheet" href="${CDN_BASE_URL}/plugin/highlight/monokai.min.css">
+    <link rel="stylesheet" href="${CDN_BASE_URL}/plugin/highlight/zenburn.min.css">
     <style>
         .reveal pre code {
-            max-height: 400px;
+            max-height: 600px; /* Increased max-height for better viewing */
             width: 100%;
             display: block;
             overflow-x: auto;
@@ -832,7 +800,7 @@ const RevealJSGenerator = () => {
         document.addEventListener('keydown', function(e) {
             if (e.key === 's' || e.key === 'S') {
                 e.preventDefault();
-                alert('Speaker view is disabled in preview mode.\\n\\nDownload the HTML file to use speaker view with full functionality.');
+                // You can optionally show a custom message here
             }
         });
     </script>
@@ -844,7 +812,7 @@ const RevealJSGenerator = () => {
   const cdnUrls = useMemo(() => ({
     revealCSS: `${CDN_BASE_URL}/reveal.min.css`,
     themeCSS: `${CDN_BASE_URL}/theme/${selectedTheme}.min.css`,
-    highlightCSS: `${CDN_BASE_URL}/plugin/highlight/monokai.min.css`,
+    highlightCSS: `${CDN_BASE_URL}/plugin/highlight/zenburn.min.css`,
     revealJS: `${CDN_BASE_URL}/reveal.min.js`,
     highlightJS: `${CDN_BASE_URL}/plugin/highlight/highlight.min.js`,
     notesJS: `${CDN_BASE_URL}/plugin/notes/notes.min.js`
@@ -897,7 +865,7 @@ ${highlightCSS}
     
     <style>
         .reveal pre code {
-            max-height: 400px;
+            max-height: 600px;
             width: 100%;
             display: block;
             overflow-x: auto;
@@ -958,112 +926,76 @@ ${notesJS}
   }, [markdownInput, selectedTransition, cdnUrls, isDownloading]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <header className="text-center mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-            MarkSlide Studio
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Transform your markdown into beautiful presentations with Reveal.js.
-          </p>
-        </header>
+    <div className="flex flex-col lg:flex-row h-screen bg-background font-sans">
+      {/* Sidebar */}
+      <aside className="w-full lg:w-1/2 h-1/2 lg:h-full flex flex-col bg-sidebar p-4 border-r border-border">
+        <h1 className="text-xl font-bold text-text-primary mb-4">Markslide Studio</h1>
         
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-          {/* Input Panel */}
-          <section className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                  <h2 className="text-xl font-bold text-gray-900">
-                    ✍️ Markdown Editor
-                  </h2>
-                  <p className="text-sm text-gray-600 mt-1">Write your presentation content</p>
-                </div>
-                <div className="flex gap-4">
-                  <ThemeSelector 
-                    value={selectedTheme} 
-                    onChange={setSelectedTheme} 
-                  />
-                  <TransitionSelector 
-                    value={selectedTransition} 
-                    onChange={setSelectedTransition} 
-                  />
-                </div>
-              </div>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex gap-4">
+            <ThemeSelector 
+              value={selectedTheme} 
+              onChange={setSelectedTheme} 
+            />
+            <TransitionSelector 
+              value={selectedTransition} 
+              onChange={setSelectedTransition} 
+            />
+            <div>
+              <label className="text-sm font-medium text-transparent select-none">Download</label>
+              <button 
+                onClick={downloadOfflinePresentation}
+                disabled={isDownloading}
+                className="mt-1 px-4 py-2 bg-surface border border-border text-text-primary rounded-md hover:bg-background disabled:opacity-50 text-sm font-semibold transition-colors flex items-center gap-2"
+                aria-label="Download presentation as offline HTML file"
+              >
+                {isDownloading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
+                    <span>Downloading...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    <span>Download</span>
+                  </>
+                )}
+              </button>
             </div>
-            
-            <div className="p-6">
-              <textarea
-                value={markdownInput}
-                onChange={handleMarkdownChange}
-                className="w-full h-96 p-4 border-2 border-gray-200 rounded-xl font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-gray-50 hover:bg-white"
-                placeholder="Enter your markdown here..."
-                aria-label="Markdown input for presentation content"
-              />
-            </div>
-            
-            <DocumentationSection />
-          </section>
-          
-          {/* Preview Panel */}
-          <section className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-4 border-b border-gray-200">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                  <h2 className="text-xl font-bold text-gray-900">
-                    📺 Live Preview
-                  </h2>
-                  <p className="text-sm text-gray-600 mt-1">See your presentation in real-time</p>
-                </div>
-                <button 
-                  onClick={downloadOfflinePresentation}
-                  disabled={isDownloading}
-                  className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:from-green-700 hover:to-emerald-700 disabled:from-green-400 disabled:to-emerald-400 text-sm font-semibold transition-all shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none flex items-center gap-2"
-                  aria-label="Download presentation as offline HTML file"
-                >
-                  {isDownloading ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                      Downloading...
-                    </>
-                  ) : (
-                    <>
-                      💾 Download HTML
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-            
-            <div className="p-6">
-              <div className="border-2 border-gray-200 rounded-xl overflow-hidden bg-gray-900">
-                <iframe
-                  ref={previewIframeRef}
-                  srcDoc={presentationHTML}
-                  className="w-full h-96"
-                  title="Presentation Preview"
-                  aria-label="Live preview of the presentation"
-                />
-              </div>
-              
-              <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <div className="flex items-start gap-3">
-                  <div className="text-blue-500 mt-0.5">
-                    📝
-                  </div>
-                  <div className="text-sm text-blue-800">
-                    <p className="font-semibold mb-1">Navigation Guide</p>
-                    <p>Use arrow keys (← → ↑ ↓) to navigate slides in the preview above.</p>
-                    <p>Use escape keys to view the slides in overview mode.</p>
-                    <p className="mt-1">Download the HTML file for full-screen presenting and speaker view (press <kbd className="bg-blue-100 px-1 rounded">S</kbd>).</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
+          </div>
         </div>
-      </div>
+
+        <div className="flex-grow flex flex-col">
+          <textarea
+            value={markdownInput}
+            onChange={handleMarkdownChange}
+            className="w-full flex-grow p-4 border border-border rounded-md font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary bg-surface text-text-primary"
+            placeholder="Enter your markdown here..."
+            aria-label="Markdown input for presentation content"
+          />
+        </div>
+        
+        <div className="space-y-2 mt-4 overflow-y-auto">
+          <ProTipsSection />
+          <DocumentationSection />
+        </div>
+      </aside>
+
+      {/* Main Content: Preview */}
+      <main className="w-full lg:w-1/2 h-1/2 lg:h-full flex-grow flex items-center justify-center bg-background p-4">
+        <div className="w-full h-full border border-border rounded-lg shadow-lg overflow-hidden bg-white">
+          <iframe
+            ref={previewIframeRef}
+            srcDoc={presentationHTML}
+            className="w-full h-full"
+            title="Presentation Preview"
+            aria-label="Live preview of the presentation"
+            sandbox="allow-scripts allow-same-origin"
+          />
+        </div>
+      </main>
     </div>
   );
 };
