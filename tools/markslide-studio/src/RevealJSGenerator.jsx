@@ -1,10 +1,13 @@
 import { useState, useRef, useCallback, useMemo } from 'react';
+import { markslideThemeCSS } from './theme/markslide.js';
+import { zenburnLightCSS } from './theme/zenburn-light.js';
 
 // Configuration constants
 const REVEAL_JS_VERSION = '5.2.1';
 const CDN_BASE_URL = `https://cdnjs.cloudflare.com/ajax/libs/reveal.js/${REVEAL_JS_VERSION}`;
 
 const THEME_OPTIONS = [
+  { value: 'markslide', label: 'Markslide' },
   { value: 'black', label: 'Black' },
   { value: 'white', label: 'White' },
   { value: 'league', label: 'League' },
@@ -69,7 +72,7 @@ Press ↓ to explore more!
 
 ### 📈 Chart Data
 
-![Chart](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iMTAwIiB4PSI0MCIgeT0iMjUiIGZpbGw9IiNmZjZiNmIiLz4KICA8cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iMTIwIiB4PSIxMDAiIHk9IjUiIGZpbGw9IiM0ZWNkYzQiLz4KICA8cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iMTEwIiB4PSIxNjAiIHk9IjE1IiBmaWxsPSIjNDViN2QxIi8+CiAgPHRleHQgeD0iNjAiIHk9IjE0NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSIjMzMzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5RMTwvdGV4dD4KICA8dGV4dCB4PSIxMjAiIHk9IjE0NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSIjMzMzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5RMjwvdGV4dD4KICA8dGV4dCB4PSIxODAiIHk9IjE0NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSIjMzMzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5RMzwvdGV4dD4KPC9zdmc+)
+![Chart](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iMTAwIiB4PSI0MCIgeT0iMjUiIGZpbGw9IiNmZjZiNmIiLz4KICA8cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iMTIwIiB4PSIxMDAiIHk9IjUiIGZpbGw9IiM0ZWNkYzQiLz4KICA8cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iMTEwIiB4PSIxNjAiIHk9IjE1IiBmaWxsPSIjNDViN2QxIi8+CiAgPHRleHQgeD0iNjAiIHk9IjE0NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSIjMzMzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5RMTwvdGV4dD4KICA8dGV4dCB4PSIxMjAiIHk9IjE0NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSIjMzMzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5RMjwvdGV4dD4KICA8dGV4dCB4PSIxODAiIHk9IjE0NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSIjMzMzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5RMzwvdGV4dD4KPC9zdmc+) 
 
 - **Q1 2024**: 150% growth
 - **Q2 2024**: 200% growth  
@@ -307,15 +310,15 @@ const processSlideContent = content => {
 
   // Extract and placeholder code blocks
   content = content.replace(
-    /```(\w+)?\s*\{([^}]+)\}\s*\n([\s\S]*?)```/g,
+    /```(\w+)?\s*\{([^}]+)\}?\s*\n([\s\S]*?)```/g,
     (match, lang, attrs, code) => {
       const placeholder = `__CODE_BLOCK_${codeIndex}__`;
-      if (attrs.includes('data-id')) {
+      if (attrs && attrs.includes('data-id')) {
         codeBlocks[codeIndex] =
           `<pre ${attrs}><code class="language-${lang || ''}" data-trim data-line-numbers>${code.trim()}</code></pre>`;
       } else {
         codeBlocks[codeIndex] =
-          `<pre><code class="language-${lang || ''}" ${attrs} data-trim>${code.trim()}</code></pre>`;
+          `<pre><code class="language-${lang || ''}" ${attrs || ''} data-trim>${code.trim()}</code></pre>`;
       }
       codeIndex++;
       return placeholder;
@@ -336,22 +339,22 @@ const processSlideContent = content => {
   // Process markdown elements
   let processed = content
     .replace(/^###### (.*?)\s*\{([^}]+)\}/gm, '<h6 $2>$1</h6>')
-    .replace(/^##### (.*?)\s*\{([^}]+)\}/gm, '<h5 $2>$1</h5>')
-    .replace(/^#### (.*?)\s*\{([^}]+)\}/gm, '<h4 $2>$1</h4>')
-    .replace(/^### (.*?)\s*\{([^}]+)\}/gm, '<h3 $2>$1</h3>')
-    .replace(/^## (.*?)\s*\{([^}]+)\}/gm, '<h2 $2>$1</h2>')
-    .replace(/^# (.*?)\s*\{([^}]+)\}/gm, '<h1 $2>$1</h1>')
+    .replace(/^##### (.*?)\s*\{([^}]+)\}/gm, '<h5 $2>$1<\/h5>')
+    .replace(/^#### (.*?)\s*\{([^}]+)\}/gm, '<h4 $2>$1<\/h4>')
+    .replace(/^### (.*?)\s*\{([^}]+)\}/gm, '<h3 $2>$1<\/h3>')
+    .replace(/^## (.*?)\s*\{([^}]+)\}/gm, '<h2 $2>$1<\/h2>')
+    .replace(/^# (.*?)\s*\{([^}]+)\}/gm, '<h1 $2>$1<\/h1>')
     .replace(/^###### (.*$)/gm, '<h6>$1</h6>')
-    .replace(/^##### (.*$)/gm, '<h5>$1</h5>')
-    .replace(/^#### (.*$)/gm, '<h4>$1</h4>')
-    .replace(/^### (.*$)/gm, '<h3>$1</h3>')
-    .replace(/^## (.*$)/gm, '<h2>$1</h2>')
-    .replace(/^# (.*$)/gm, '<h1>$1</h1>')
-    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" />')
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/`([^`]+)`/g, '<code>$1</code>');
+    .replace(/^##### (.*$)/gm, '<h5>$1<\/h5>')
+    .replace(/^#### (.*$)/gm, '<h4>$1<\/h4>')
+    .replace(/^### (.*$)/gm, '<h3>$1<\/h3>')
+    .replace(/^## (.*$)/gm, '<h2>$1<\/h2>')
+    .replace(/^# (.*$)/gm, '<h1>$1<\/h1>')
+    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" \/>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1<\/a>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1<\/strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1<\/em>')
+    .replace(/`([^`]+)`/g, '<code>$1<\/code>');
 
   // Process lists
   processed = processLists(processed);
@@ -370,7 +373,7 @@ const processSlideContent = content => {
       ) {
         return line;
       } else if (!line.match(/^<\/?\w+/)) {
-        return `<p>${line}</p>`;
+        return `<p>${line}<\/p>`;
       }
       return line;
     });
@@ -402,19 +405,19 @@ const convertMarkdownToSlides = markdown => {
           const { content, attributes } = extractSlideAttributes(slide.trim());
           return `            <section${attributes}>
                 ${processSlideContent(content)}
-            </section>`;
+            <\/section>`;
         })
         .join('\n');
       return `        <section>
 ${verticalSections}
-        </section>`;
+        <\/section>`;
     } else {
       const { content, attributes } = extractSlideAttributes(
         horizontalSlide.trim()
       );
       return `            <section${attributes}>
                 ${processSlideContent(content)}
-            </section>`;
+            <\/section>`;
     }
   });
 
@@ -540,98 +543,7 @@ const ProTipsSection = () => {
 const DocumentationSection = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const copyAIDocumentation = () => {
-    const aiDoc = `# MarkSlide Studio - AI Documentation
-
-## Purpose
-MarkSlide Studio converts Markdown to Reveal.js presentations with advanced features.
-
-## Core Markdown Syntax
-
-### Slide Navigation
-- \`---\` = New horizontal slide (main sections)
-- \`--\` = New vertical slide (sub-sections under main slides)
-
-### Text Formatting
-- \`**text**\` = Bold text
-- \`*text*\` = Italic text
-- \`\`code\`\` = Inline code
-- \`# ## ### #### ##### ######\` = Headers (h1-h6)
-
-### Lists
-- \`- * +\` = Unordered/bullet lists
-- \`1. 2. 3.\` = Ordered/numbered lists
-
-### Links & Media
-- \`[text](url)\` = Clickable links
-- \`![alt](image.jpg)\` = Embedded images
-
-## Advanced Features
-
-### Auto-Animate Slides
-Create smooth transitions between slides with matching elements:
-\`\`\`markdown
-## My Title {data-auto-animate}
-# Moving Element {data-id="unique"}
-Content here
-
----
-
-## My Title {data-auto-animate}
-# Moving Element {data-id="unique" style="color: red;"}
-New content!
-\`\`\`
-Key: Use same data-id across consecutive slides for smooth animations.
-
-### Speaker Notes
-Add private notes visible only in speaker view:
-\`\`\`markdown
-## My Slide
-Visible content here
-
-<aside class="notes">
-  Private speaker notes
-  • Key talking points
-  • Reminders
-</aside>
-\`\`\`
-Access: Press 'S' in downloaded HTML to open speaker view.
-
-### Code Presentations
-Basic code blocks:
-\`\`\`javascript
-function hello() {
-  return "Hello World!";
-}
-\`\`\`
-
-Animated code (for code evolution demos):
-\`\`\`javascript {data-id="code"}
-function hello() {
-  return "Hello!";
-}
-\`\`\`
-
-## Usage Instructions
-1. Enter Markdown in the left editor panel
-2. Select theme and transition in the dropdowns
-3. Preview updates in real-time on the right panel
-4. Download self-contained HTML file for presentations
-5. Use arrow keys to navigate slides in preview
-6. Press 'S' in downloaded HTML for speaker view
-
-## Technical Notes
-- Full Unicode support (international characters, emojis, math symbols)
-- Offline functionality in downloaded HTML
-- Built on Reveal.js ${REVEAL_JS_VERSION}
-- Responsive design for all screen sizes
-- Code syntax highlighting included
-
-## Best Practices
-- Use same data-id across consecutive auto-animate slides
-- Vertical slides (--) create detailed sub-sections
-- Add speaker notes for professional presentations
-- Test navigation with arrow keys before presenting
-- Download HTML for offline presenting`;
+    const aiDoc = `# MarkSlide Studio - AI Documentation\n\n## Purpose\nMarkSlide Studio converts Markdown to Reveal.js presentations with advanced features.\n\n## Core Markdown Syntax\n\n### Slide Navigation\n- \`---\` = New horizontal slide (main sections)\n- \`--\` = New vertical slide (sub-sections under main slides)\n\n### Text Formatting\n- \`**text**\` = Bold text\n- \`*text*\` = Italic text\n- \`\`code\`\` = Inline code\n- \`# ## ### #### ##### ######\` = Headers (h1-h6)\n\n### Lists\n- \`- * +\` = Unordered/bullet lists\n- \`1. 2. 3.\` = Ordered/numbered lists\n\n### Links & Media\n- \`[text](url)\` = Clickable links\n- \`![alt](image.jpg)\` = Embedded images\n\n## Advanced Features\n\n### Auto-Animate Slides\nCreate smooth transitions between slides with matching elements:\n\`\`\`markdown\n## My Title {data-auto-animate}\n# Moving Element {data-id="unique"}\nContent here\n\n---\n\n## My Title {data-auto-animate}\n# Moving Element {data-id="unique" style="color: red;"}\nNew content!\n\`\`\`\nKey: Use same data-id across consecutive slides for smooth animations.\n\n### Speaker Notes\nAdd private notes visible only in speaker view:\n\`\`\`markdown\n## My Slide\nVisible content here\n\n<aside class="notes">\n  Private speaker notes\n  • Key talking points\n  • Reminders\n</aside>\n\`\`\`\nAccess: Press 'S' in downloaded HTML to open speaker view.\n\n### Code Presentations\nBasic code blocks:\n\`\`\`javascript\nfunction hello() {\n  return "Hello World!";\n}\n\`\`\`\n\nAnimated code (for code evolution demos):\n\`\`\`javascript {data-id="code"}\nfunction hello() {\n  return "Hello!";\n}\n\`\`\`\n\n## Usage Instructions\n1. Enter Markdown in the left editor panel\n2. Select theme and transition in the dropdowns\n3. Preview updates in real-time on the right panel\n4. Download self-contained HTML file for presentations\n5. Use arrow keys to navigate slides in preview\n6. Press 'S' in downloaded HTML for speaker view\n\n## Technical Notes\n- Full Unicode support (international characters, emojis, math symbols)\n- Offline functionality in downloaded HTML\n- Built on Reveal.js ${REVEAL_JS_VERSION}\n- Responsive design for all screen sizes\n- Code syntax highlighting included\n\n## Best Practices\n- Use same data-id across consecutive auto-animate slides\n- Vertical slides (--) create detailed sub-sections\n- Add speaker notes for professional presentations\n- Test navigation with arrow keys before presenting\n- Download HTML for offline presenting`;
 
     navigator.clipboard
       .writeText(aiDoc)
@@ -857,7 +769,7 @@ function hello() {
 
 const RevealJSGenerator = () => {
   const [markdownInput, setMarkdownInput] = useState(DEFAULT_MARKDOWN);
-  const [selectedTheme, setSelectedTheme] = useState('black');
+  const [selectedTheme, setSelectedTheme] = useState('markslide');
   const [selectedTransition, setSelectedTransition] = useState('slide');
   const [isDownloading, setIsDownloading] = useState(false);
 
@@ -866,13 +778,22 @@ const RevealJSGenerator = () => {
   // Memoized presentation HTML to prevent unnecessary recalculation
   const presentationHTML = useMemo(() => {
     const slidesHtml = convertMarkdownToSlides(markdownInput);
+    const themeMarkup =
+      selectedTheme === 'markslide'
+        ? `<style>${markslideThemeCSS}</style>`
+        : `<link rel="stylesheet" href="${CDN_BASE_URL}/theme/${selectedTheme}.min.css">`;
+
+    const highlightThemeMarkup =
+      selectedTheme === 'markslide'
+        ? `<style>${zenburnLightCSS}</style>`
+        : `<link rel="stylesheet" href="${CDN_BASE_URL}/plugin/highlight/zenburn.min.css">`;
 
     return `<!DOCTYPE html>
 <html>
 <head>
     <link rel="stylesheet" href="${CDN_BASE_URL}/reveal.min.css">
-    <link rel="stylesheet" href="${CDN_BASE_URL}/theme/${selectedTheme}.min.css">
-    <link rel="stylesheet" href="${CDN_BASE_URL}/plugin/highlight/zenburn.min.css">
+    ${themeMarkup}
+    ${highlightThemeMarkup}
     <style>
         .reveal pre code {
             max-height: 600px; /* Increased max-height for better viewing */
@@ -943,23 +864,22 @@ const RevealJSGenerator = () => {
     setIsDownloading(true);
 
     try {
-      const responses = await Promise.all([
-        fetch(cdnUrls.revealCSS),
-        fetch(cdnUrls.themeCSS),
-        fetch(cdnUrls.highlightCSS),
-        fetch(cdnUrls.revealJS),
-        fetch(cdnUrls.highlightJS),
-        fetch(cdnUrls.notesJS),
+      const [revealCSS, revealJS, highlightJS, notesJS] = await Promise.all([
+        fetch(cdnUrls.revealCSS).then(r => r.text()),
+        fetch(cdnUrls.revealJS).then(r => r.text()),
+        fetch(cdnUrls.highlightJS).then(r => r.text()),
+        fetch(cdnUrls.notesJS).then(r => r.text()),
       ]);
 
-      const [
-        revealCSS,
-        themeCSS,
-        highlightCSS,
-        revealJS,
-        highlightJS,
-        notesJS,
-      ] = await Promise.all(responses.map(r => r.text()));
+      const themeCSS =
+        selectedTheme === 'markslide'
+          ? markslideThemeCSS
+          : await fetch(cdnUrls.themeCSS).then(r => r.text());
+
+      const highlightCSS =
+        selectedTheme === 'markslide'
+          ? zenburnLightCSS
+          : await fetch(cdnUrls.highlightCSS).then(r => r.text());
 
       const slidesHtml = convertMarkdownToSlides(markdownInput);
       const filename = extractTitleFromMarkdown(markdownInput);
@@ -1042,7 +962,13 @@ ${notesJS}
     } finally {
       setIsDownloading(false);
     }
-  }, [markdownInput, selectedTransition, cdnUrls, isDownloading]);
+  }, [
+    markdownInput,
+    selectedTheme,
+    selectedTransition,
+    cdnUrls,
+    isDownloading,
+  ]);
 
   return (
     <div className="flex flex-col lg:flex-row h-screen bg-background font-sans">
