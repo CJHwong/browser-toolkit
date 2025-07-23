@@ -256,3 +256,4 @@ firebase-debug.log
 # Temporary deployment directories
 _site/
 public/
+!/tools/markslide-studio/public/
