@@ -15,7 +15,7 @@ Transform markdown into beautiful RevealJS presentations with auto-animations an
 **Features:**
 
 - Live markdown preview
-- Multiple themes and transitions  
+- Multiple themes and transitions
 - Auto-animate slide transitions
 - Speaker notes with private view
 - Offline HTML export with full functionality
@@ -48,7 +48,7 @@ npm install && npm ci --workspaces
 # Start development server
 npm run dev
 
-# Build for production with cache-busting  
+# Build for production with cache-busting
 bash scripts/build.sh
 
 # Deploy to GitHub Pages
@@ -106,7 +106,7 @@ Add a new tool card to `index.html` following the existing pattern.
 ### **✅ Must Have**
 
 - **Client-side only**: Works with static hosting
-- **Self-contained**: No shared dependencies between tools  
+- **Self-contained**: No shared dependencies between tools
 - **Offline capable**: Functions after initial load
 - **Cache-friendly**: Works with our hash-based system
 
