@@ -1,6 +1,6 @@
 export const zenburnLightCSS = `
 /*
-  Markslide Zenburn Light style
+  MarkSlide Zenburn Light style
   Based on Zenburn style from voldmar.ru (c) Vladimir Epifanov <voldmar @voldmar.ru>
   Adapted for light backgrounds.
 */
