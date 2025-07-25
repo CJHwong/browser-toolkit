@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image to Base64 Converter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+      .drop-zone-active {
+        border-color: #2563eb; /* blue-600 */
+        background-color: #eff6ff; /* blue-50 */
+      }
+      .feedback-message {
+        animation: fadeInOut 2s ease-in-out;
+      }
+      @keyframes fadeInOut {
+        0%,
+        100% {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        10%,
+        90% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 flex items-center justify-center min-h-screen p-4"
+  >
+    <div class="w-full max-w-2xl mx-auto">
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 md:p-8">
+        <h1
+          class="text-2xl md:text-3xl font-bold text-center text-gray-900 dark:text-white mb-2"
+        >
+          Image to Base64 Converter
+        </h1>
+        <p class="text-center text-gray-500 dark:text-gray-400 mb-6">
+          Drag & drop, click to upload, or paste an image.
+        </p>
+
+        <!-- Drop Zone -->
+        <div
+          id="drop-zone"
+          class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 text-center cursor-pointer transition-all duration-300 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+        >
+          <div
+            id="initial-state"
+            class="flex flex-col items-center justify-center space-y-4"
+          >
+            <svg
+              class="w-16 h-16 text-gray-400 dark:text-gray-500"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+              />
+            </svg>
+            <p class="text-gray-500 dark:text-gray-400">
+              <span class="font-semibold text-blue-600 dark:text-blue-400"
+                >Click to upload</span
+              >
+              or drag and drop
+            </p>
+            <p class="text-xs text-gray-400 dark:text-gray-500">
+              SVG, PNG, JPG, GIF, or WEBP
+            </p>
+          </div>
+          <input type="file" id="file-input" class="hidden" accept="image/*" />
+        </div>
+
+        <!-- Result Display -->
+        <div id="result-state" class="hidden mt-6">
+          <div class="flex flex-col md:flex-row gap-6">
+            <!-- Image Preview -->
+            <div class="w-full md:w-1/3">
+              <h2
+                class="text-lg font-semibold mb-2 text-gray-900 dark:text-white"
+              >
+                Preview
+              </h2>
+              <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-2">
+                <img
+                  id="image-preview"
+                  src="#"
+                  alt="Image preview"
+                  class="rounded-md max-w-full h-auto mx-auto object-contain max-h-48"
+                  onerror="this.src='https://placehold.co/200x200/e2e8f0/94a3b8?text=Invalid+Image'; this.onerror=null;"
+                />
+              </div>
+            </div>
+            <!-- Base64 Output -->
+            <div class="w-full md:w-2/3">
+              <h2
+                class="text-lg font-semibold mb-2 text-gray-900 dark:text-white"
+              >
+                Base64 URL
+              </h2>
+              <textarea
+                id="base64-output"
+                rows="6"
+                class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-sm text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                readonly
+              ></textarea>
+            </div>
+          </div>
+          <div
+            id="feedback-message"
+            class="text-center text-green-500 mt-4 h-6"
+          ></div>
+          <!-- Action Buttons -->
+          <div
+            class="mt-4 flex flex-col sm:flex-row items-center justify-center gap-4"
+          >
+            <button
+              id="copy-button"
+              class="w-full sm:w-auto flex items-center justify-center gap-2 bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800"
+            >
+              <svg
+                class="w-5 h-5"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 4.5l-3-3m0 0l-3 3m3-3v12"
+                />
+              </svg>
+              Copy to Clipboard
+            </button>
+            <button
+              id="clear-button"
+              class="w-full sm:w-auto flex items-center justify-center gap-2 bg-gray-200 text-gray-700 font-semibold py-2 px-6 rounded-lg hover:bg-gray-300 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500 dark:focus:ring-offset-gray-800"
+            >
+              <svg
+                class="w-5 h-5"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                />
+              </svg>
+              Clear
+            </button>
+          </div>
+        </div>
+      </div>
+      <footer class="text-center mt-4">
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          A simple tool for developers.
+        </p>
+      </footer>
+    </div>
+
+    <script>
+      const dropZone = document.getElementById('drop-zone');
+      const fileInput = document.getElementById('file-input');
+      const imagePreview = document.getElementById('image-preview');
+      const base64Output = document.getElementById('base64-output');
+      const initialState = document.getElementById('initial-state');
+      const resultState = document.getElementById('result-state');
+      const copyButton = document.getElementById('copy-button');
+      const clearButton = document.getElementById('clear-button');
+      const feedbackMessage = document.getElementById('feedback-message');
+
+      // --- Event Listeners ---
+
+      // Open file dialog when drop zone is clicked
+      dropZone.addEventListener('click', () => fileInput.click());
+
+      // Handle file selection from dialog
+      fileInput.addEventListener('change', e => {
+        const files = e.target.files;
+        if (files.length > 0) {
+          handleFile(files[0]);
+        }
+      });
+
+      // Drag and drop events
+      dropZone.addEventListener('dragover', e => {
+        e.preventDefault();
+        dropZone.classList.add('drop-zone-active');
+      });
+
+      dropZone.addEventListener('dragleave', e => {
+        e.preventDefault();
+        dropZone.classList.remove('drop-zone-active');
+      });
+
+      dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.classList.remove('drop-zone-active');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          handleFile(files[0]);
+        }
+      });
+
+      // Paste event
+      window.addEventListener('paste', e => {
+        const files = e.clipboardData.files;
+        if (files.length > 0) {
+          // Check if the pasted item is an image file
+          const imageFile = Array.from(files).find(file =>
+            file.type.startsWith('image/')
+          );
+          if (imageFile) {
+            handleFile(imageFile);
+          }
+        }
+      });
+
+      // Copy button functionality
+      copyButton.addEventListener('click', () => {
+        base64Output.select();
+        // Using document.execCommand for broader iframe compatibility
+        try {
+          document.execCommand('copy');
+          showFeedback('Copied to clipboard!');
+        } catch (err) {
+          console.error('Failed to copy text: ', err);
+          showFeedback('Failed to copy. Please copy manually.');
+        }
+        window.getSelection().removeAllRanges(); // Deselect
+      });
+
+      // Clear button functionality
+      clearButton.addEventListener('click', resetUI);
+
+      // --- Core Functions ---
+
+      /**
+       * Handles the selected or dropped image file.
+       * @param {File} file The image file.
+       */
+      function handleFile(file) {
+        if (!file.type.startsWith('image/')) {
+          alert('Please drop an image file.');
+          return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = e => {
+          const base64String = e.target.result;
+          imagePreview.src = base64String;
+          base64Output.value = base64String;
+          showResultState();
+        };
+
+        reader.onerror = error => {
+          console.error('Error reading file:', error);
+          alert('Sorry, there was an error reading the file.');
+          resetUI();
+        };
+
+        reader.readAsDataURL(file);
+      }
+
+      /**
+       * Switches the UI to show the results.
+       */
+      function showResultState() {
+        dropZone.classList.add('hidden');
+        resultState.classList.remove('hidden');
+      }
+
+      /**
+       * Resets the UI to its initial state.
+       */
+      function resetUI() {
+        fileInput.value = ''; // Clear the file input
+        dropZone.classList.remove('hidden');
+        resultState.classList.add('hidden');
+        imagePreview.src = '#';
+        base64Output.value = '';
+        feedbackMessage.textContent = '';
+      }
+
+      /**
+       * Shows a temporary feedback message.
+       * @param {string} message The message to display.
+       */
+      function showFeedback(message) {
+        feedbackMessage.textContent = message;
+        feedbackMessage.classList.remove('feedback-message');
+        // This is a trick to re-trigger the animation
+        void feedbackMessage.offsetWidth;
+        feedbackMessage.classList.add('feedback-message');
+      }
+    </script>
+  </body>
+</html>
