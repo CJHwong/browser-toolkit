@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scrum Poker</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header>
+        <h1>Scrum Poker</h1>
+        <div id="session-info">
+          <div id="copy-container" title="Click to copy URL">
+            <span
+              >Session: <a id="session-url" href="#" target="_blank"></a
+            ></span>
+            <span id="copy-feedback"></span>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <div id="user-setup" class="container">
+          <h2>Join or Create a Session</h2>
+          <input type="text" id="name-input" placeholder="Your name..." />
+          <div class="button-group">
+            <button id="join-btn">Join Session</button>
+            <button id="create-session-btn" class="secondary">
+              Create New Session
+            </button>
+          </div>
+        </div>
+
+        <div id="poker-room" class="container hidden">
+          <div id="participants-section">
+            <h2>Participants</h2>
+            <ul id="participants-list"></ul>
+          </div>
+
+          <div id="voting-section">
+            <h2>Cast Your Vote</h2>
+            <div id="cards-container">
+              <!-- Voting cards will be generated here -->
+            </div>
+          </div>
+
+          <div id="controls-section">
+            <div class="buttons">
+              <h2>Controls</h2>
+              <button id="reveal-btn">Reveal Votes</button>
+              <button id="reset-btn">New Round</button>
+            </div>
+            <div id="suggestion-container" class="hidden">
+              <h2>Suggestion</h2>
+              <div id="suggestion-value"></div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-app-check-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-database-compat.js"></script>
+
+    <!-- Your App's Script -->
+    <script src="app.js"></script>
+  </body>
+</html>
