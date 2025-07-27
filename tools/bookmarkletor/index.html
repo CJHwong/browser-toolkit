@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bookmarkletor</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header>
+        <h1>Bookmarkletor</h1>
+        <p>
+          Paste your valid JavaScript code below. This tool will format it as a
+          bookmarklet without minifying or changing the logic.
+        </p>
+      </header>
+
+      <main>
+        <textarea
+          id="js-input"
+          placeholder="Enter your JavaScript code here..."
+        ></textarea>
+        <button id="generate-btn">Generate Bookmarklet</button>
+        <div id="output-container" class="hidden">
+          <div class="output-group">
+            <label>Bookmarklet Link</label>
+            <div id="bookmarklet-link-container">
+              <!-- Draggable link appears here -->
+            </div>
+            <p class="description">Drag this link to your bookmarks bar.</p>
+          </div>
+          <div class="output-group">
+            <label for="raw-output">Bookmarklet Code</label>
+            <div class="raw-output-wrapper">
+              <textarea id="raw-output" readonly></textarea>
+              <button id="copy-btn" title="Copy to Clipboard">Copy</button>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <section class="intro-section">
+        <div class="intro-column">
+          <h3>What is a Bookmarklet?</h3>
+          <p>
+            A bookmarklet is a small piece of JavaScript code saved as a browser
+            bookmark. When you click it, the code runs on the current web page,
+            allowing you to add new features or modify its behavior.
+          </p>
+        </div>
+        <div class="intro-column">
+          <h3>How to Install</h3>
+          <ol>
+            <li>Generate the bookmarklet using the tool below.</li>
+            <li>A link will appear that says "Drag Me to Bookmarks".</li>
+            <li>Click and drag this link to your browser's Bookmarks Bar.</li>
+            <li>Click the new bookmark on any page to run your code.</li>
+          </ol>
+          <p class="tip">
+            <strong>Tip:</strong> If your Bookmarks Bar is hidden, press
+            <code>Cmd/Ctrl + Shift + B</code> to show it.
+          </p>
+        </div>
+      </section>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>
