@@ -30,177 +30,204 @@ const TRANSITION_OPTIONS = [
   { value: 'none', label: 'None' },
 ];
 
-const DEFAULT_MARKDOWN = `# 🚀 Welcome to My Presentation
+const DEFAULT_MARKDOWN = `# 🚀 MarkSlide Studio
+
+Turn Markdown into **beautiful** presentations with Reveal.js!
 
 ---
 
-## Auto-Animate Demo {data-auto-animate}
+## 📋 Table Demo
 
-# Moving Title {data-id="title"}
+| Feature | Status | Priority | Notes |
+|---------|--------|----------|-------|
+| **Tables** | ✅ Complete | High | Full alignment support |
+| **Task Lists** | ✅ Complete | Medium | Interactive checkboxes |
+| ~~Strikethrough~~ | ✅ Complete | Low | Cross out text |
+| Superscript^TM^ | ✅ Complete | Low | Mathematical notation |
+| Subscript~2~ | ✅ Complete | Low | Chemical formulas |
 
-Simple text animation that works perfectly!
-
-<aside class="notes">
-  Welcome everyone! This slide demonstrates auto-animate with a simple title that will change color and text on the next slide.
-</aside>
-
----
-
-## Auto-Animate Demo {data-auto-animate}
-
-# Moving Title (Now Red!) {data-id="title" style="color: red;"}
-
-The text smoothly changes color and content!
-
-<aside class="notes">
-  Notice how the title smoothly animated from the previous slide. The color changed to red and the text updated seamlessly.
-</aside>
+> This is a blockquote demonstrating enhanced styling with beautiful borders and typography. Great for highlighting important information or quotes from others.
 
 ---
 
-## 📊 Vertical Slides Example
+## ✅ Task Management Demo
 
-This slide has vertical content below
+### Project Checklist
 
-Press ↓ to explore more!
-
-<aside class="notes">
-  This slide introduces vertical navigation. Remind the audience to use the down arrow to see more detailed information.
-</aside>
+- [x] Set up development environment
+- [x] Design initial mockups  
+- [x] Implement core features
+- [ ] Add comprehensive testing
+- [ ] Deploy to production
+- [ ] Create documentation
 
 --
 
-### 📈 Chart Data
+### Shopping List
 
-![Chart](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iMTAwIiB4PSI0MCIgeT0iMjUiIGZpbGw9IiNmZjZiNmIiLz4KICA8cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iMTIwIiB4PSIxMDAiIHk9IjUiIGZpbGw9IiM0ZWNkYzQiLz4KICA8cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iMTEwIiB4PSIxNjAiIHk9IjE1IiBmaWxsPSIjNDViN2QxIi8+CiAgPHRleHQgeD0iNjAiIHk9IjE0NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSIjMzMzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5RMTwvdGV4dD4KICA8dGV4dCB4PSIxMjAiIHk9IjE0NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSIjMzMzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5RMjwvdGV4dD4KICA8dGV4dCB4PSIxODAiIHk9IjE0NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSIjMzMzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5RMzwvdGV4dD4KPC9zdmc+) 
-
-- **Q1 2024**: 150% growth
-- **Q2 2024**: 200% growth  
-- **Q3 2024**: 180% growth
-
-
-<aside class="notes">
-  Our growth metrics show strong performance across all quarters. The SVG chart visualizes this data clearly, with Q2 showing our peak performance at 200% growth.
-</aside>
-
---
-
-### 🎯 Goals & Metrics
-
-**Key Performance Indicators:**
-
-- Customer Satisfaction: **95%**
-- Response Time: **< 2 seconds**
-- Uptime: **99.9%**
-
-### 🏆 Achievement Unlocked
-**99.9% Uptime Maintained!**
-
-<aside class="notes">
-  These KPIs demonstrate our commitment to excellence. The 99.9% uptime is particularly noteworthy and shows our reliability.
-</aside>
-
---
-
-### 📋 Action Items
-
-1. **Implement new features** by *end of month*
-2. **Optimize performance** using [latest tools](https://example.com/tools)
-3. **Team training** on new \`frameworks\`
-
-<aside class="notes">
-  Here are our key action items. Make sure to emphasize the deadlines and the importance of team training.
-</aside>
+- [x] Milk and eggs
+- [x] Fresh vegetables
+- [ ] Artisan bread
+- [ ] Premium coffee beans
 
 ---
 
-## 💻 Code Evolution {data-auto-animate}
+## 📚 Definition Lists & Text Formatting
 
-\`\`\`javascript {data-id="code-demo"}
-// Simple function
-function greet() {
-  return "Hello!";
+HTML
+: HyperText Markup Language - the standard markup language for web pages
+
+--
+
+CSS  
+: Cascading Style Sheets - describes presentation of HTML documents
+
+--
+
+JavaScript
+: A programming language that enables interactive web pages
+
+---
+
+### Enhanced Text Formatting Examples
+
+- **Bold text** for emphasis
+- *Italic text* for subtle emphasis  
+- ~~Strikethrough~~ for corrections
+- \`inline code\` for technical terms
+- Superscript: E = mc^2^ (Einstein's equation)
+- Subscript: H~2~O (Water molecule)
+- Mathematical symbols: ∑, ∫, ∞, ≠, ≤, ≥
+- HTML entities: &copy; &reg; &trade; &hellip; &mdash;
+
+### 🎬 Inline Animation Examples
+
+How {are|data-id="word1" style="color: blue;"} you doing today?
+
+This is a {powerful|data-id="highlight" style="background: yellow; padding: 2px;"} feature!
+
+---
+
+## 🌐 Links & Images Demo
+
+[Visit our website](https://example.com "Official Website")
+
+![Beautiful landscape](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ic2t5IiB4MT0iMCUiIHkxPSIwJSIgeDI9IjAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiM4N0NFRkE7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6I0ZGRkZGRjtzdG9wLW9wYWNpdHk6MSIgLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjAwIiBmaWxsPSJ1cmwoI3NreSkiLz4KICA8Y2lyY2xlIGN4PSIzMDAiIGN5PSI2MCIgcj0iMzAiIGZpbGw9IiNGRkQ3MDAiLz4KICA8cG9seWdvbiBwb2ludHM9IjAsOTAgMTAwLDUwIDIwMCw3MCAzMDAsNDAgNDAwLDYwIDQwMCwyMDAgMCwyMDAiIGZpbGw9IiM0Rjc5NDIiLz4KICA8dGV4dCB4PSIyMDAiIHk9IjE4MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjMzMzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5CZWF1dGlmdWwgTGFuZHNjYXBlPC90ZXh0Pgo8L3N2Zz4= "Sample landscape image")
+
+---
+
+## 🎬 Animation Demo {data-auto-animate}
+
+How {are|data-id="word-demo" style="color: blue; font-size: 1.2em;"} you today?
+
+Simple inline styling with smooth animations!
+
+---
+
+## 🎬 Animation Demo {data-auto-animate}
+
+How {ARE|data-id="word-demo" style="color: red; font-size: 2em; font-weight: bold;"} you today?
+
+The word smoothly animates to a new style!
+
+---
+
+## 💻 Code Examples {data-auto-animate}
+
+\`\`\`javascript {data-id="enhanced-code"}
+// Enhanced markdown processing
+function processMarkdown(content) {
+  return content
+    .replace(/~~(.*?)~~/g, '<del>$1</del>')
+    .replace(/\^([^\s^]+)/g, '<sup>$1</sup>')
+    .replace(/~([^\s~]+)/g, '<sub>$1</sub>');
 }
 \`\`\`
 
 <aside class="notes">
-  We start with a simple function. This will evolve through the next few slides to show progressively more complex code.
+This demonstrates enhanced code blocks with proper syntax highlighting and the new text formatting features we've implemented.
 </aside>
 
 ---
 
-## 💻 Code Evolution {data-auto-animate}
+## 💻 Advanced Code Features {data-auto-animate}
 
-\`\`\`javascript {data-id="code-demo"}
-// Enhanced function with parameters
-function greet(name, time) {
-  const timeGreeting = getTimeGreeting(time);
-  return \`\${timeGreeting}, \${name}!\`;
+\`\`\`typescript {data-id="enhanced-code"}
+// Full-featured markdown processor with TypeScript
+interface MarkdownProcessor {
+  processTable(content: string): string;
+  processBlockquotes(content: string): string;
+  processTaskLists(content: string): string;
 }
 
-function getTimeGreeting(hour) {
-  if (hour < 12) return "Good morning";
-  if (hour < 18) return "Good afternoon";
-  return "Good evening";
+class EnhancedMarkdownProcessor implements MarkdownProcessor {
+  processTable(content: string): string {
+    // Advanced table processing with alignment
+    return this.parseTableStructure(content);
+  }
+  
+  processBlockquotes(content: string): string {
+    return content.replace(/^> /gm, '<blockquote>');
+  }
+  
+  processTaskLists(content: string): string {
+    return content.replace(
+      /- \[([ x])\] (.+)/g, 
+      '<input type="checkbox" $1> $2'
+    );
+  }
 }
 \`\`\`
 
-<aside class="notes">
-  Now we've enhanced the function to accept parameters and use helper functions. The code smoothly animated from the previous version.
-</aside>
+---
+
+## 🎨 All Features Summary
+
+### ✅ Newly Added Features
+
+1. **Tables** with alignment support (left, center, right)
+2. **Task Lists** with interactive checkboxes  
+3. **Enhanced Text**: ~~strikethrough~~, super^script^, sub~script~
+4. **Blockquotes** with beautiful styling
+5. **Horizontal Rules** with gradient effects
+6. **Definition Lists** for terminology
+7. **HTML Entities**: &copy; &reg; &trade; &hellip; &mdash; &ndash;
+8. **Enhanced Links** with title attributes
+9. **Better Images** with rounded corners & shadows
+10. **🎬 Inline Animations**: {text|data-id="id" style="color: red;"}
 
 ---
 
-## 🌍 Unicode Support
+### 🚀 Original Features (Still Amazing!)
 
-This presentation supports **全世界** (worldwide) content:
-
-- 🇯🇵 こんにちは (Hello in Japanese)
-- 🇪🇸 ¡Hola! (Hello in Spanish)  
-- 🇷🇺 Привет! (Hello in Russian)
-- 🇨🇳 你好! (Hello in Chinese)
-- 🇦🇪 مرحبا! (Hello in Arabic)
-- Mathematical symbols: ∑ ∫ ∞ ≠ ≤ ≥
-- Emojis work perfectly: 🎨 🚀 💡 ⚡ 🌟
-
-<aside class="notes">
-  This slide demonstrates full Unicode support. All international characters, mathematical symbols, and emojis render correctly in both the preview and downloaded HTML.
-</aside>
-
----
-
-## 🎤 Speaker Notes Demo
-
-This slide demonstrates speaker notes functionality.
-
-**Press 'S' to open speaker view** (works in downloaded HTML)
-
-<aside class="notes">
-  These are speaker notes! They appear in speaker view but not on the main presentation.
-  
-  Key points to remember:
-  - Speaker notes support markdown formatting
-  - You can see current and next slides
-  - Timer shows elapsed time
-  - Use this for detailed talking points
-  
-  **Pro tip:** Practice with speaker notes to improve your presentation flow!
-</aside>
+- **Auto-animate** transitions between slides
+- **Speaker notes** (press 'S' in downloaded HTML)  
+- **Code highlighting** with multiple languages
+- **Unicode support**: 🌍 中文 العربية ∑∫∞
+- **Vertical slides** with \`--\` separator
+- **Custom attributes** for advanced styling
+- **Export options**: HTML download & PDF generation
 
 ---
 
 ## 🎉 Thank You!
 
-### Questions or feedback?
+### Ready to create stunning presentations?
 
-*Let's connect and build amazing presentations together!*
+*All markdown features now work beautifully together!*
 
-**Contact:** [hello@example.com](mailto:hello@example.com)
+**Try the new features:** Edit the markdown and see live updates
 
-🚀 **Happy Presenting!** 🚀
+📧 **Questions?** [hello@example.com](mailto:hello@example.com)
 
 <aside class="notes">
-  End on a positive note. Thank the audience and open the floor for questions. Remember to provide contact information for follow-up discussions.
+This completes our comprehensive markdown feature demonstration. All the common markdown formats are now fully supported with beautiful styling and smooth rendering.
+
+Remind users to:
+- Try editing the markdown to test features
+- Download HTML for offline presenting  
+- Use speaker notes for better presentations
+- Explore vertical slides with arrow keys
 </aside>`;
 
 // Utility functions
@@ -236,6 +263,159 @@ const extractSlideAttributes = content => {
   return { content, attributes: '' };
 };
 
+const processInlineStyles = content => {
+  // Process inline styling and animation syntax: {text|attributes}
+  return content.replace(/\{([^|]+)\|([^}]+)\}/g, (match, text, attributes) => {
+    return `<span ${attributes}>${text}</span>`;
+  });
+};
+
+const processCellMarkdown = cellContent => {
+  // Process basic markdown formatting within table cells
+  return (
+    cellContent
+      // Inline styles and animations (process first to avoid conflicts)
+      .replace(/\{([^|]+)\|([^}]+)\}/g, (match, text, attributes) => {
+        return `<span ${attributes}>${text}</span>`;
+      })
+      // Images and links
+      .replace(
+        /!\[([^\]]*)\]\(([^)]+)(?:\s+"([^"]*)")?\)/g,
+        (match, alt, src, title) => {
+          return title
+            ? `<img src="${src}" alt="${alt}" title="${title}">`
+            : `<img src="${src}" alt="${alt}">`;
+        }
+      )
+      .replace(
+        /\[([^\]]+)\]\(([^)]+)(?:\s+"([^"]*)")?\)/g,
+        (match, text, href, title) => {
+          return title
+            ? `<a href="${href}" title="${title}">${text}</a>`
+            : `<a href="${href}">${text}</a>`;
+        }
+      )
+      // Text formatting
+      .replace(/~~(.*?)~~/g, '<del>$1</del>') // Strikethrough
+      .replace(/\^([^^]+)\^/g, '<sup>$1</sup>') // Superscript
+      .replace(/~([^~]+)~/g, '<sub>$1</sub>') // Subscript
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+      .replace(/\*(.*?)\*/g, '<em>$1</em>') // Italic
+      .replace(/`([^`]+)`/g, '<code>$1</code>') // Inline code
+      // HTML entities
+      .replace(/&copy;/g, '©')
+      .replace(/&reg;/g, '®')
+      .replace(/&trade;/g, '™')
+      .replace(/&hellip;/g, '…')
+      .replace(/&mdash;/g, '—')
+      .replace(/&ndash;/g, '–')
+      .replace(/&quot;/g, '"')
+      .replace(/&apos;/g, "'")
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&')
+  );
+};
+
+const processTable = tableContent => {
+  const lines = tableContent.split('\n').filter(line => line.trim());
+  if (lines.length < 2) return tableContent;
+
+  const headerRow = lines[0];
+  const separatorRow = lines[1];
+  const dataRows = lines.slice(2);
+
+  // Parse header
+  const headerCells = headerRow
+    .split('|')
+    .map(cell => cell.trim())
+    .filter(cell => cell);
+
+  // Parse alignment from separator row
+  const alignments = separatorRow
+    .split('|')
+    .map(cell => {
+      const trimmed = cell.trim();
+      if (trimmed.startsWith(':') && trimmed.endsWith(':')) return 'center';
+      if (trimmed.endsWith(':')) return 'right';
+      return 'left';
+    })
+    .filter((_, index) => index < headerCells.length);
+
+  // Build table HTML
+  let tableHTML = '<table class="reveal-table">\n<thead>\n<tr>\n';
+
+  headerCells.forEach((cell, index) => {
+    const align = alignments[index] || 'left';
+    const processedCell = processCellMarkdown(cell);
+    tableHTML += `  <th style="text-align: ${align}">${processedCell}</th>\n`;
+  });
+
+  tableHTML += '</tr>\n</thead>\n<tbody>\n';
+
+  // Process data rows
+  dataRows.forEach(row => {
+    const cells = row
+      .split('|')
+      .map(cell => cell.trim())
+      .filter(cell => cell);
+    if (cells.length > 0) {
+      tableHTML += '<tr>\n';
+      cells.forEach((cell, index) => {
+        const align = alignments[index] || 'left';
+        const processedCell = processCellMarkdown(cell);
+        tableHTML += `  <td style="text-align: ${align}">${processedCell}</td>\n`;
+      });
+      tableHTML += '</tr>\n';
+    }
+  });
+
+  tableHTML += '</tbody>\n</table>';
+  return tableHTML;
+};
+
+const processBlockquotes = content => {
+  const lines = content.split('\n');
+  const result = [];
+  let inBlockquote = false;
+  let blockquoteContent = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmedLine = line.trim();
+
+    if (trimmedLine.startsWith('> ')) {
+      if (!inBlockquote) {
+        inBlockquote = true;
+        blockquoteContent = [];
+      }
+      blockquoteContent.push(trimmedLine.substring(2));
+    } else if (trimmedLine === '>') {
+      if (!inBlockquote) {
+        inBlockquote = true;
+        blockquoteContent = [];
+      }
+      blockquoteContent.push('');
+    } else {
+      if (inBlockquote) {
+        result.push(
+          `<blockquote>${blockquoteContent.join('<br>')}</blockquote>`
+        );
+        inBlockquote = false;
+        blockquoteContent = [];
+      }
+      result.push(line);
+    }
+  }
+
+  // Handle case where content ends with blockquote
+  if (inBlockquote) {
+    result.push(`<blockquote>${blockquoteContent.join('<br>')}</blockquote>`);
+  }
+
+  return result.join('\n');
+};
+
 const processLists = content => {
   const lines = content.split('\n');
   const result = [];
@@ -246,15 +426,33 @@ const processLists = content => {
     const line = lines[i];
     const trimmedLine = line.trim();
 
+    // Check for task list items (- [ ] or - [x])
+    const taskListMatch = trimmedLine.match(/^[-*+]\s+\[([ x])\]\s+(.+)$/);
     // Check for unordered list items (-, *, +)
     const unorderedMatch = trimmedLine.match(/^[-*+]\s+(.+)$/);
     // Check for ordered list items (1., 2., etc.)
     const orderedMatch = trimmedLine.match(/^\d+\.\s+(.+)$/);
 
-    if (unorderedMatch) {
+    if (taskListMatch) {
+      const [, checked, taskText] = taskListMatch;
+      const isChecked = checked === 'x';
+
+      if (currentList === null || listType !== 'task') {
+        if (currentList !== null) {
+          result.push(`</${listType === 'task' ? 'ul' : listType}>`);
+        }
+        currentList = [];
+        listType = 'task';
+        result.push('<ul class="task-list">');
+      }
+
+      result.push(`<li class="task-item">
+        <input type="checkbox" ${isChecked ? 'checked' : ''} disabled> ${taskText}
+      </li>`);
+    } else if (unorderedMatch) {
       if (currentList === null || listType !== 'ul') {
         if (currentList !== null) {
-          result.push(`</${listType}>`);
+          result.push(`</${listType === 'task' ? 'ul' : listType}>`);
         }
         currentList = [];
         listType = 'ul';
@@ -264,7 +462,7 @@ const processLists = content => {
     } else if (orderedMatch) {
       if (currentList === null || listType !== 'ol') {
         if (currentList !== null) {
-          result.push(`</${listType}>`);
+          result.push(`</${listType === 'task' ? 'ul' : listType}>`);
         }
         currentList = [];
         listType = 'ol';
@@ -274,7 +472,7 @@ const processLists = content => {
     } else {
       // Not a list item
       if (currentList !== null) {
-        result.push(`</${listType}>`);
+        result.push(`</${listType === 'task' ? 'ul' : listType}>`);
         currentList = null;
         listType = null;
       }
@@ -284,7 +482,63 @@ const processLists = content => {
 
   // Close any remaining list
   if (currentList !== null) {
-    result.push(`</${listType}>`);
+    result.push(`</${listType === 'task' ? 'ul' : listType}>`);
+  }
+
+  return result.join('\n');
+};
+
+const processDefinitionLists = content => {
+  const lines = content.split('\n');
+  const result = [];
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i];
+    const trimmedLine = line.trim();
+
+    // Check if current line is a term and next line is a definition
+    if (i < lines.length - 1) {
+      const nextLine = lines[i + 1];
+      const nextTrimmed = nextLine.trim();
+      const descMatch = nextTrimmed.match(/^:\s+(.+)$/);
+
+      if (trimmedLine && !trimmedLine.startsWith(':') && descMatch) {
+        // Found a definition list pattern
+        result.push('<dl>');
+
+        // Process the term
+        result.push(`<dt>${trimmedLine}</dt>`);
+
+        // Process the definition
+        result.push(`<dd>${descMatch[1]}</dd>`);
+
+        // Skip the next line since we already processed it
+        i += 2;
+
+        // Continue processing subsequent definition pairs
+        while (i < lines.length - 1) {
+          const currentTerm = lines[i].trim();
+          const nextDefLine = lines[i + 1].trim();
+          const nextDefMatch = nextDefLine.match(/^:\s+(.+)$/);
+
+          if (currentTerm && !currentTerm.startsWith(':') && nextDefMatch) {
+            result.push(`<dt>${currentTerm}</dt>`);
+            result.push(`<dd>${nextDefMatch[1]}</dd>`);
+            i += 2;
+          } else {
+            break;
+          }
+        }
+
+        result.push('</dl>');
+        continue;
+      }
+    }
+
+    // Not a definition list, add the line as-is
+    result.push(line);
+    i++;
   }
 
   return result.join('\n');
@@ -293,8 +547,10 @@ const processLists = content => {
 const processSlideContent = content => {
   const codeBlocks = [];
   const speakerNotes = [];
+  const tables = [];
   let codeIndex = 0;
   let notesIndex = 0;
+  let tableIndex = 0;
 
   // Extract and placeholder speaker notes first
   content = content.replace(
@@ -336,28 +592,85 @@ const processSlideContent = content => {
     }
   );
 
-  // Process markdown elements
+  // Extract and process tables
+  content = content.replace(
+    /(?:^|\n)(\|.+\|\n\|[-:\s|]+\|\n(?:\|.+\|\n?)*)/gm,
+    (match, tableContent) => {
+      const placeholder = `__TABLE_${tableIndex}__`;
+      tables[tableIndex] = processTable(tableContent.trim());
+      tableIndex++;
+      return placeholder;
+    }
+  );
+
+  // Process inline styles first to avoid conflicts with other formatting
+  content = processInlineStyles(content);
+
+  // Process markdown elements with enhanced support
   let processed = content
+    // Headers with attributes
     .replace(/^###### (.*?)\s*\{([^}]+)\}/gm, '<h6 $2>$1</h6>')
     .replace(/^##### (.*?)\s*\{([^}]+)\}/gm, '<h5 $2>$1<\/h5>')
     .replace(/^#### (.*?)\s*\{([^}]+)\}/gm, '<h4 $2>$1<\/h4>')
     .replace(/^### (.*?)\s*\{([^}]+)\}/gm, '<h3 $2>$1<\/h3>')
     .replace(/^## (.*?)\s*\{([^}]+)\}/gm, '<h2 $2>$1<\/h2>')
     .replace(/^# (.*?)\s*\{([^}]+)\}/gm, '<h1 $2>$1<\/h1>')
+    // Regular headers
     .replace(/^###### (.*$)/gm, '<h6>$1</h6>')
     .replace(/^##### (.*$)/gm, '<h5>$1<\/h5>')
     .replace(/^#### (.*$)/gm, '<h4>$1<\/h4>')
     .replace(/^### (.*$)/gm, '<h3>$1<\/h3>')
     .replace(/^## (.*$)/gm, '<h2>$1<\/h2>')
     .replace(/^# (.*$)/gm, '<h1>$1<\/h1>')
-    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" \/>')
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1<\/a>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1<\/strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1<\/em>')
-    .replace(/`([^`]+)`/g, '<code>$1<\/code>');
+    // Horizontal rules
+    .replace(/^---+$/gm, '<hr>')
+    .replace(/^\*\*\*+$/gm, '<hr>')
+    .replace(/^___+$/gm, '<hr>')
+    // Images and links
+    .replace(
+      /!\[([^\]]*)\]\(([^)]+)(?:\s+"([^"]*)")?\)/g,
+      (match, alt, src, title) => {
+        return title
+          ? `<img src="${src}" alt="${alt}" title="${title}">`
+          : `<img src="${src}" alt="${alt}">`;
+      }
+    )
+    .replace(
+      /\[([^\]]+)\]\(([^)]+)(?:\s+"([^"]*)")?\)/g,
+      (match, text, href, title) => {
+        return title
+          ? `<a href="${href}" title="${title}">${text}</a>`
+          : `<a href="${href}">${text}</a>`;
+      }
+    )
+    // Enhanced text formatting
+    .replace(/~~(.*?)~~/g, '<del>$1</del>') // Strikethrough
+    .replace(/\^([^^]+)\^/g, '<sup>$1</sup>') // Superscript
+    .replace(/~([^~]+)~/g, '<sub>$1</sub>') // Subscript
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1<\/strong>') // Bold
+    .replace(/\*(.*?)\*/g, '<em>$1<\/em>') // Italic
+    .replace(/`([^`]+)`/g, '<code>$1<\/code>') // Inline code
+    // HTML entities
+    .replace(/&copy;/g, '©')
+    .replace(/&reg;/g, '®')
+    .replace(/&trade;/g, '™')
+    .replace(/&hellip;/g, '…')
+    .replace(/&mdash;/g, '—')
+    .replace(/&ndash;/g, '–')
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&');
 
-  // Process lists
+  // Process blockquotes
+  processed = processBlockquotes(processed);
+
+  // Process lists (enhanced to include task lists)
   processed = processLists(processed);
+
+  // Process definition lists
+  processed = processDefinitionLists(processed);
 
   // Handle paragraphs
   const lines = processed.split('\n');
@@ -369,6 +682,7 @@ const processSlideContent = content => {
         line.match(/^<[^>]+>/) ||
         line.match(/^__CODE_BLOCK_\d+__$/) ||
         line.match(/^__SPEAKER_NOTE_\d+__$/) ||
+        line.match(/^__TABLE_\d+__$/) ||
         line.match(/<\/[^>]+>$/)
       ) {
         return line;
@@ -379,6 +693,11 @@ const processSlideContent = content => {
     });
 
   processed = processedLines.join('\n');
+
+  // Restore tables
+  tables.forEach((table, index) => {
+    processed = processed.replace(`__TABLE_${index}__`, table);
+  });
 
   // Restore code blocks
   codeBlocks.forEach((block, index) => {
