@@ -186,3 +186,7 @@ echo "🚀 Next steps:"
 echo "   1. Test locally: cd docs && python -m http.server 8080"
 echo "   2. Commit: git add docs/ && git commit -m 'Deploy: Hash $HASH'"
 echo "   3. Push: git push origin main"
+
+echo ""
+echo "💅 running code format"
+npm run format
