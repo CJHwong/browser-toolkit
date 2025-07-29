@@ -1,4 +1,4 @@
-/* global alert, console, document, fetch, firebase, localStorage, navigator, setTimeout, URLSearchParams, window */
+// Firebase is defined as a global in ESLint config
 
 // --- DOM Elements ---
 const userSetupSection = document.getElementById('user-setup');
