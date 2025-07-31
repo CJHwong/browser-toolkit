@@ -15,6 +15,10 @@ const copyContainer = document.getElementById('copy-container');
 const copyFeedback = document.getElementById('copy-feedback');
 const suggestionContainer = document.getElementById('suggestion-container');
 const suggestionValue = document.getElementById('suggestion-value');
+const qrCode = document.getElementById('qr-code');
+const qrCodeLarge = document.getElementById('qr-code-large');
+const qrModal = document.getElementById('qr-modal');
+const qrCloseBtn = document.getElementById('qr-close-btn');
 
 // --- App State ---
 let sessionId = null;
@@ -35,6 +39,16 @@ function handleDatabaseError(error) {
   alert(
     `A database error occurred: ${error.message}. You might not have permission for this action or your connection was interrupted.`
   );
+}
+
+/**
+ * Generates QR code URL for the given session URL.
+ * @param {string} url - The session URL to encode.
+ * @returns {string} The QR code image URL.
+ */
+function generateQRCode(url) {
+  const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
+  return qrApiUrl;
 }
 
 /**
@@ -78,6 +92,11 @@ function updateSessionUrl() {
   const url = window.location.href;
   sessionUrlLink.href = url;
   sessionUrlLink.textContent = `Session: ${sessionId}`;
+
+  // Generate and set QR codes
+  const qrUrl = generateQRCode(url);
+  qrCode.src = qrUrl;
+  qrCodeLarge.src = qrUrl;
 }
 
 /**
@@ -395,6 +414,21 @@ copyContainer.addEventListener('click', e => {
       copyFeedback.textContent = 'Failed!';
       console.error('Failed to copy URL: ', err);
     });
+});
+
+// QR Modal event listeners
+qrCode.addEventListener('click', () => {
+  qrModal.classList.remove('hidden');
+});
+
+qrCloseBtn.addEventListener('click', () => {
+  qrModal.classList.add('hidden');
+});
+
+qrModal.addEventListener('click', e => {
+  if (e.target === qrModal) {
+    qrModal.classList.add('hidden');
+  }
 });
 
 // --- App Initialization ---
