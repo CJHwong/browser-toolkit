@@ -4,7 +4,7 @@ import reactHooks from 'eslint-plugin-react-hooks';
 
 export default [
   js.configs.recommended,
-  
+
   // ES Module files first (most specific)
   {
     files: ['eslint.config.mjs', 'tools/markslide-studio/src/theme/*.js'],
@@ -25,10 +25,13 @@ export default [
       'no-var': 'error',
     },
   },
-  
+
   // React/JSX files
   {
-    files: ['tools/markslide-studio/src/**/*.js', 'tools/markslide-studio/src/**/*.jsx'],
+    files: [
+      'tools/markslide-studio/src/**/*.js',
+      'tools/markslide-studio/src/**/*.jsx',
+    ],
     plugins: {
       react,
       'react-hooks': reactHooks,
@@ -80,7 +83,7 @@ export default [
       'no-useless-escape': 'off', // Allow regex escapes
     },
   },
-  
+
   // Node.js config files
   {
     files: [
@@ -104,7 +107,7 @@ export default [
       'no-var': 'error',
     },
   },
-  
+
   // General browser JavaScript files (but exclude ES modules)
   {
     files: ['**/*.js'],
@@ -171,7 +174,7 @@ export default [
       'no-control-regex': 'warn',
     },
   },
-  
+
   // Global ignores
   {
     ignores: [
