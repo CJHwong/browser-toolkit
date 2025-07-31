@@ -21,6 +21,7 @@ let sessionId = null;
 let userId = null;
 let sessionRef = null;
 let database = null;
+let isSessionCreator = false;
 const pokerCards = ['0', '1', '2', '3', '5', '8', '13', '21', '?', '☕'];
 
 // --- Core Functions ---
@@ -128,6 +129,9 @@ function render(sessionData) {
     pokerRoomSection.classList.add('hidden');
   }
 
+  // Check if current user is session creator
+  isSessionCreator = sessionData.creatorId === userId;
+
   // Render participants
   participantsList.innerHTML = '';
   for (const id in users) {
@@ -145,8 +149,14 @@ function render(sessionData) {
       voteDisplay = `<span class="vote-status ${statusClass}">${status}</span>`;
     }
 
+    // Create kick button for session creator (but not for themselves)
+    let kickButton = '';
+    if (isSessionCreator && id !== userId) {
+      kickButton = `<button class="kick-btn" onclick="kickUser('${id}')" title="Remove user">×</button>`;
+    }
+
     // XSS Fix: Use textContent for user-provided names
-    li.innerHTML = `<span></span> ${voteDisplay}`;
+    li.innerHTML = `<div class="participant-info"><span></span> ${voteDisplay}</div>${kickButton}`;
     li.querySelector('span').textContent = user.name;
     participantsList.appendChild(li);
   }
@@ -315,6 +325,25 @@ function newRound() {
   });
 }
 
+/**
+ * Kicks a user from the session (only available to session creator).
+ * @param {string} userIdToKick - The ID of the user to remove.
+ */
+window.kickUser = function kickUser(userIdToKick) {
+  if (!isSessionCreator) {
+    alert('Only the session creator can remove users.');
+    return;
+  }
+
+  if (confirm('Are you sure you want to remove this user from the session?')) {
+    sessionRef
+      .child('users')
+      .child(userIdToKick)
+      .remove()
+      .catch(handleDatabaseError);
+  }
+};
+
 // --- Event Listeners ---
 joinBtn.addEventListener('click', joinSession);
 revealBtn.addEventListener('click', revealVotes);
@@ -340,6 +369,7 @@ createSessionBtn.addEventListener('click', () => {
       },
     },
     isRevealed: false,
+    creatorId: userId,
   };
 
   newSessionRef

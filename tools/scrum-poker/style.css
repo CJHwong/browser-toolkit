@@ -202,6 +202,42 @@ button:disabled {
   font-size: 0.95em;
 }
 
+.participant-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-grow: 1;
+}
+
+.kick-btn {
+  background-color: var(--text-secondary);
+  color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-left: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  transition: all 0.2s;
+  opacity: 0.7;
+  text-align: center;
+  font-family: monospace;
+}
+
+.kick-btn:hover {
+  background-color: var(--text-primary);
+  border-color: var(--text-primary);
+  opacity: 1;
+  transform: scale(1.1);
+}
+
 #participants-list .vote-status {
   font-weight: 600;
   font-size: 1.1em;
