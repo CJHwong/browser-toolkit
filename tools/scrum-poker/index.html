@@ -26,6 +26,52 @@
               </div>
             </div>
           </div>
+          <div id="bookmarklet-container">
+            <button
+              id="bookmarklet-btn"
+              title="Generate bookmarklet for this session"
+            >
+              🔗
+            </button>
+            <div id="bookmarklet-modal" class="hidden">
+              <div id="bookmarklet-modal-content">
+                <h3>Session Bookmarklet</h3>
+                <p>
+                  Drag this link to your bookmarks bar or copy the code below:
+                </p>
+                <div id="bookmarklet-link-container">
+                  <a
+                    id="bookmarklet-link"
+                    href="#"
+                    title="Drag to bookmarks bar"
+                    >🎯 Scrum Poker</a
+                  >
+                </div>
+                <div id="bookmarklet-code-container">
+                  <textarea id="bookmarklet-code" readonly></textarea>
+                  <button id="copy-bookmarklet-btn">Copy Code</button>
+                </div>
+                <div id="bookmarklet-instructions">
+                  <h4>How to use:</h4>
+                  <ol>
+                    <li>
+                      <strong>Drag & Drop:</strong> Drag the link above to your
+                      bookmarks bar
+                    </li>
+                    <li>
+                      <strong>Manual:</strong> Copy the code and create a new
+                      bookmark with it
+                    </li>
+                    <li>
+                      <strong>Use:</strong> Click the bookmark on any website to
+                      open this session in a side panel
+                    </li>
+                  </ol>
+                </div>
+                <button id="bookmarklet-close-btn">×</button>
+              </div>
+            </div>
+          </div>
         </div>
       </header>
 
