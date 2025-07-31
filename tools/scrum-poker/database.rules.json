@@ -1,0 +1,38 @@
+{
+  "rules": {
+    "scrum-poker-sessions": {
+      "$sessionId": {
+        ".read": "auth != null",
+        ".write": "auth != null",
+        ".validate": "newData.hasChildren(['isRevealed', 'creatorId']) && newData.hasChild('users')",
+        "creatorId": {
+          ".validate": "newData.isString() && newData.val().length > 0"
+        },
+        "isRevealed": {
+          ".validate": "newData.isBoolean()"
+        },
+        "users": {
+          ".validate": "newData.hasChildren()",
+          "$userId": {
+            ".write": "auth != null && (auth.uid == $userId || auth.uid == root.child('scrum-poker-sessions').child($sessionId).child('creatorId').val())",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length < 50"
+            },
+            "vote": {
+              ".validate": "newData.val() === null || (newData.isString() && ['0','1','2','3','5','8','13','21','?','☕'].indexOf(newData.val()) >= 0)"
+            },
+            "hasVoted": {
+              ".validate": "newData.isBoolean()"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    }
+  }
+}
