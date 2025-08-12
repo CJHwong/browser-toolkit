@@ -32,7 +32,7 @@ let userId = null;
 let sessionRef = null;
 let database = null;
 let isSessionCreator = false;
-const pokerCards = ['0', '1', '2', '3', '5', '8', '13', '21', '?', '☕'];
+const pokerCards = ['0.5', '1', '2', '3', '5', '8', '13', '21', '?', '☕'];
 
 // --- Core Functions ---
 
