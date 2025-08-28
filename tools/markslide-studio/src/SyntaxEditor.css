@@ -1,0 +1,317 @@
+/* Syntax Highlighting Editor Styles - Transparent textarea over markdown preview */
+
+.syntax-editor {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 0.375rem; /* rounded-md */
+  border: 1px solid theme('colors.border');
+  background: theme('colors.surface');
+}
+
+/* Preview layer - renders syntax-highlighted markdown behind the textarea */
+.syntax-preview {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 48px; /* Leave space for shortcuts hint */
+  padding: 1rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  pointer-events: none;
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Monaco', 'Cascadia Code', 'Roboto Mono',
+    monospace;
+  font-size: 0.875rem; /* text-sm */
+  line-height: 1.5;
+  color: theme('colors.text-secondary');
+  background: transparent;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  z-index: 1;
+}
+
+/* Transparent textarea - positioned over the preview */
+.syntax-textarea {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 48px; /* Leave space for shortcuts hint */
+  padding: 1rem;
+  margin: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: theme('colors.text-primary');
+  font-family:
+    'JetBrains Mono', 'Fira Code', 'Monaco', 'Cascadia Code', 'Roboto Mono',
+    monospace;
+  font-size: 0.875rem; /* text-sm */
+  line-height: 1.5;
+  resize: none;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 2;
+
+  /* Make the actual text transparent, but keep cursor and selection visible */
+  color: transparent;
+  caret-color: theme('colors.text-primary');
+
+  /* Selection styling */
+  selection: {
+    background-color: theme('colors.primary / 20%');
+    color: transparent;
+  }
+}
+
+.syntax-textarea::selection {
+  background-color: rgba(96, 125, 139, 0.2); /* primary with opacity */
+  color: transparent;
+}
+
+.syntax-textarea::-moz-selection {
+  background-color: rgba(96, 125, 139, 0.2); /* primary with opacity */
+  color: transparent;
+}
+
+/* Show cursor when focused */
+.syntax-textarea.focused {
+  caret-color: theme('colors.text-primary');
+}
+
+/* Placeholder styling */
+.syntax-textarea::placeholder {
+  color: theme('colors.text-secondary');
+  opacity: 0.6;
+}
+
+/* Keyboard shortcuts hint at the bottom */
+.syntax-shortcuts {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  padding: 0.75rem 1rem;
+  background: theme('colors.sidebar');
+  border-top: 1px solid theme('colors.border');
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4;
+}
+
+.shortcut-hint {
+  font-size: 0.75rem; /* text-xs */
+  color: theme('colors.text-secondary');
+  font-weight: 500;
+}
+
+.shortcut-hint kbd {
+  display: inline-block;
+  padding: 0.25rem 0.375rem;
+  font-size: 0.6875rem; /* smaller than xs */
+  font-family: inherit;
+  background-color: theme('colors.border');
+  color: theme('colors.text-primary');
+  border-radius: 0.25rem;
+  margin: 0 0.125rem;
+  font-weight: 600;
+}
+
+/* Markdown Syntax Highlighting Styles */
+
+/* Header markers and text */
+.syntax-preview .md-header-marker {
+  color: #8b949e; /* Muted gray for # symbols */
+  font-weight: bold;
+}
+
+.syntax-preview .md-header-text {
+  color: theme('colors.text-primary');
+  font-weight: 600;
+}
+
+/* Horizontal rules */
+.syntax-preview .md-hr {
+  color: #6366f1; /* Indigo for visual separation */
+  font-weight: bold;
+}
+
+/* List markers and text */
+.syntax-preview .md-list-marker {
+  color: #f59e0b; /* Amber for list bullets/numbers */
+  font-weight: bold;
+}
+
+.syntax-preview .md-list-text {
+  color: theme('colors.text-secondary');
+}
+
+/* Task list markers */
+.syntax-preview .md-task-marker {
+  color: #10b981; /* Emerald for checkboxes */
+  font-weight: bold;
+}
+
+.syntax-preview .md-task-text {
+  color: theme('colors.text-secondary');
+}
+
+/* Blockquote markers and text */
+.syntax-preview .md-blockquote-marker {
+  color: #8b5cf6; /* Purple for > symbol */
+  font-weight: bold;
+}
+
+.syntax-preview .md-blockquote-text {
+  color: #8b5cf6;
+  font-style: italic;
+}
+
+/* Bold text styling */
+.syntax-preview .md-bold-marker {
+  color: #dc2626; /* Red for ** or __ markers */
+  font-weight: bold;
+}
+
+.syntax-preview .md-bold-text {
+  color: theme('colors.text-primary');
+  font-weight: bold;
+}
+
+/* Italic text styling */
+.syntax-preview .md-italic-marker {
+  color: #059669; /* Emerald for * or _ markers */
+  font-weight: normal;
+}
+
+.syntax-preview .md-italic-text {
+  color: theme('colors.text-primary');
+  font-style: italic;
+}
+
+/* Strikethrough styling */
+.syntax-preview .md-strikethrough-marker {
+  color: #6b7280; /* Gray for ~~ markers */
+}
+
+.syntax-preview .md-strikethrough-text {
+  color: #6b7280;
+  text-decoration: line-through;
+}
+
+/* Inline code styling */
+.syntax-preview .md-code-marker {
+  color: #7c3aed; /* Purple for ` markers */
+  font-weight: bold;
+}
+
+.syntax-preview .md-code-text {
+  color: #7c3aed;
+  background-color: rgba(124, 58, 237, 0.1);
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* Code block styling */
+.syntax-preview .md-code-fence {
+  color: #7c3aed; /* Purple for ``` markers */
+  font-weight: bold;
+}
+
+.syntax-preview .md-code-block {
+  color: #4b5563; /* Gray for code content */
+  background-color: rgba(75, 85, 99, 0.05);
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* Link styling */
+.syntax-preview .md-link-marker {
+  color: #3b82f6; /* Blue for [ ] ( ) markers */
+}
+
+.syntax-preview .md-link-text {
+  color: #1d4ed8; /* Darker blue for link text */
+  text-decoration: underline;
+}
+
+.syntax-preview .md-link-url {
+  color: #6b7280; /* Gray for URLs */
+}
+
+/* Image styling */
+.syntax-preview .md-image-marker {
+  color: #f59e0b; /* Amber for ![ ] ( ) markers */
+}
+
+.syntax-preview .md-image-alt {
+  color: #92400e; /* Dark amber for alt text */
+}
+
+.syntax-preview .md-image-url {
+  color: #6b7280; /* Gray for image URLs */
+}
+
+/* Superscript and subscript styling */
+.syntax-preview .md-sup-marker,
+.syntax-preview .md-sub-marker {
+  color: #ec4899; /* Pink for ^ ~ markers */
+}
+
+.syntax-preview .md-sup-text {
+  color: #be185d;
+  font-size: 0.75em;
+  vertical-align: super;
+}
+
+.syntax-preview .md-sub-text {
+  color: #be185d;
+  font-size: 0.75em;
+  vertical-align: sub;
+}
+
+/* Dark theme support (if needed) */
+@media (prefers-color-scheme: dark) {
+  .syntax-preview {
+    color: #9ca3af; /* text-secondary equivalent for dark */
+  }
+
+  .syntax-textarea {
+    caret-color: #60a5fa; /* primary equivalent for dark */
+  }
+
+  .syntax-textarea::selection {
+    background-color: rgba(96, 165, 250, 0.2);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .syntax-shortcuts {
+    height: 40px;
+    padding: 0.5rem;
+  }
+
+  .syntax-preview,
+  .syntax-textarea {
+    bottom: 40px;
+  }
+
+  .shortcut-hint {
+    font-size: 0.6875rem;
+  }
+
+  .shortcut-hint kbd {
+    padding: 0.125rem 0.25rem;
+    font-size: 0.625rem;
+  }
+}

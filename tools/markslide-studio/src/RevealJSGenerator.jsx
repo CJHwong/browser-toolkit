@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import { markslideThemeCSS } from './theme/markslide.js';
 import { zenburnLightCSS } from './theme/zenburn-light.js';
+import SyntaxEditor from './SyntaxEditor';
 
 // Configuration constants
 const REVEAL_JS_VERSION = '5.2.1';
@@ -1715,13 +1716,11 @@ ${notesJS}
           </div>
         </div>
 
-        <div className="flex-grow flex flex-col">
-          <textarea
+        <div className="flex-grow relative">
+          <SyntaxEditor
             value={markdownInput}
-            onChange={handleMarkdownChange}
-            className="w-full flex-grow p-4 border border-border rounded-md font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary bg-surface text-text-primary"
+            onChange={setMarkdownInput}
             placeholder="Enter your markdown here..."
-            aria-label="Markdown input for presentation content"
           />
         </div>
 
