@@ -7,7 +7,11 @@ export default [
 
   // ES Module files first (most specific)
   {
-    files: ['eslint.config.mjs', 'tools/markslide-studio/src/theme/*.js'],
+    files: [
+      'eslint.config.mjs',
+      'tools/markslide-studio/src/theme/*.js',
+      'tools/markslide-studio/src/utils/*.js',
+    ],
     languageOptions: {
       ecmaVersion: 2024,
       sourceType: 'module',
@@ -15,6 +19,7 @@ export default [
         window: 'readonly',
         document: 'readonly',
         console: 'readonly',
+        Event: 'readonly',
         process: 'readonly',
       },
     },
@@ -48,6 +53,7 @@ export default [
         window: 'readonly',
         document: 'readonly',
         console: 'readonly',
+        Event: 'readonly',
         Array: 'readonly',
         process: 'readonly',
         fetch: 'readonly',
@@ -78,6 +84,8 @@ export default [
       'no-var': 'error',
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
+      'react/jsx-uses-react': 'error',
+      'react/jsx-uses-vars': 'error',
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
       'no-useless-escape': 'off', // Allow regex escapes
@@ -111,7 +119,10 @@ export default [
   // General browser JavaScript files (but exclude ES modules)
   {
     files: ['**/*.js'],
-    ignores: ['tools/markslide-studio/src/theme/*.js'],
+    ignores: [
+      'tools/markslide-studio/src/theme/*.js',
+      'tools/markslide-studio/src/utils/*.js',
+    ],
     languageOptions: {
       ecmaVersion: 2024,
       sourceType: 'script',
@@ -121,6 +132,7 @@ export default [
         document: 'readonly',
         console: 'readonly',
         alert: 'readonly',
+        confirm: 'readonly',
         setTimeout: 'readonly',
         clearTimeout: 'readonly',
         setInterval: 'readonly',

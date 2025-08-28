@@ -902,8 +902,8 @@ const ExportDropdown = ({
   activeSubMenu,
   onSubMenuChange,
 }) => {
-  const [selectedHTMLNotes, setSelectedHTMLNotes] = useState('false');
-  const [selectedPDFNotes, setSelectedPDFNotes] = useState('false');
+  const [selectedHTMLNotes] = useState('false');
+  const [selectedPDFNotes] = useState('false');
   const [subMenuPosition, setSubMenuPosition] = useState('right');
 
   // Recalculate position on window resize
@@ -1534,10 +1534,6 @@ ${notesJS}
     [selectedTheme]
   );
 
-  const handleMarkdownChange = useCallback(event => {
-    setMarkdownInput(event.target.value);
-  }, []);
-
   const exportToPDF = useCallback(
     async (showNotes = 'false') => {
       if (isDownloading) return;
@@ -1600,7 +1596,7 @@ ${notesJS}
         setIsDownloading(false);
       }
     },
-    [createPresentationHTML, markdownInput, cdnUrls, isDownloading]
+    [createPresentationHTML, cdnUrls, isDownloading, selectedTheme]
   );
 
   const downloadOfflinePresentation = useCallback(
@@ -1657,7 +1653,13 @@ ${notesJS}
         setIsDownloading(false);
       }
     },
-    [createPresentationHTML, markdownInput, cdnUrls, isDownloading]
+    [
+      createPresentationHTML,
+      markdownInput,
+      cdnUrls,
+      isDownloading,
+      selectedTheme,
+    ]
   );
 
   const handleDownloadHTML = useCallback(

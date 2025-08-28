@@ -8,7 +8,6 @@ export const parseMarkdownForPreview = markdown => {
   const highlightedLines = [];
 
   let inCodeBlock = false;
-  let codeBlockLang = '';
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -19,13 +18,10 @@ export const parseMarkdownForPreview = markdown => {
       if (!inCodeBlock) {
         // Starting code block
         inCodeBlock = true;
-        const match = line.match(/^```(\w+)?/);
-        codeBlockLang = match ? match[1] || '' : '';
         highlightedLine = `<span class="md-code-fence">${escapeHtml(line)}</span>`;
       } else {
         // Ending code block
         inCodeBlock = false;
-        codeBlockLang = '';
         highlightedLine = `<span class="md-code-fence">${escapeHtml(line)}</span>`;
       }
     } else if (inCodeBlock) {

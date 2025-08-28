@@ -67,12 +67,12 @@
         max-width: 600px;
         margin: 0 auto;
       }
-      
+
       .header a {
         color: var(--primary);
         text-decoration: none;
       }
-      
+
       .header a:hover {
         text-decoration: underline;
       }
@@ -117,7 +117,7 @@
       .bookmarklet-link:hover {
         background-color: var(--primary-hover);
       }
-      
+
       .bookmarklet-link:active {
         cursor: grabbing;
       }
@@ -132,7 +132,7 @@
         color: var(--text-secondary);
         padding: 0.5rem 0;
       }
-      
+
       .code-toggle summary:hover {
         color: var(--text-primary);
       }
@@ -165,14 +165,19 @@
     <div class="container">
       <header class="header">
         <h1>Bookmarklet Showcase</h1>
-        <p>A collection of useful bookmarklets. Drag the blue buttons to your browser's bookmarks bar.</p>
+        <p>
+          A collection of useful bookmarklets. Drag the blue buttons to your
+          browser's bookmarks bar.
+        </p>
       </header>
 
       <main class="bookmarklet-list">
         <section class="bookmarklet-card">
           <h3>Simplified to Traditional Chinese Converter</h3>
           <p class="description">
-            Converts all text on a webpage from Simplified Chinese to Traditional Chinese (Taiwan standard, with phrases). Uses the OpenCC-JS library.
+            Converts all text on a webpage from Simplified Chinese to
+            Traditional Chinese (Taiwan standard, with phrases). Uses the
+            OpenCC-JS library.
           </p>
           <a
             href="javascript:(async%20function()%7Bif(typeof%20OpenCC%3D%3D%3D'undefined')%7Bconst%20script%3Ddocument.createElement('script')%3Bscript.src%3D'https%3A%2F%2Fcdn.jsdelivr.net%2Fnpm%2Fopencc-js%401.0%2Fdist%2Fumd%2Ffull.js'%3Bdocument.head.appendChild(script)%3Bawait%20new%20Promise(resolve%3D%3E%7Bscript.onload%3Dresolve%3B%7D)%3B%7Dconsole.log(%22OpenCC%20loaded.%20Starting%20conversion...%22)%3Btry%7Bconst%20converter%3Dawait%20OpenCC.Converter(%7Bfrom%3A'cn'%2Cto%3A'twp'%7D)%3Bconst%20walk%3D(node)%3D%3E%7Bif(node.nodeType%3D%3D%3D3)%7Bconst%20text%3Dnode.nodeValue%3Bconst%20convertedText%3Dconverter(text)%3Bif(convertedText!%3D%3Dtext)%7Bnode.nodeValue%3DconvertedText%3B%7Dreturn%3B%7Dif(node.nodeType%3D%3D%3D1%26%26node.nodeName!%3D'SCRIPT'%26%26node.nodeName!%3D'STYLE')%7Bfor(let%20i%3D0%3Bi%3Cnode.childNodes.length%3Bi%2B%2B)%7Bwalk(node.childNodes%5Bi%5D)%3B%7D%7D%7D%3Bwalk(document.body)%3Bconsole.log(%22Page%20converted%20to%20Traditional%20Chinese.%22)%3B%7Dcatch(error)%7Bconsole.error(%22Failed%20to%20convert%20page%3A%22%2Cerror)%3Balert(%22Failed%20to%20convert%20page%20to%20Traditional%20Chinese.%20See%20console%20for%20details.%22)%3B%7D%7D)()%3B"
