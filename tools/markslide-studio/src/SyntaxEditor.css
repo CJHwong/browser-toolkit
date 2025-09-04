@@ -64,11 +64,7 @@
   color: transparent;
   caret-color: theme('colors.text-primary');
 
-  /* Selection styling */
-  selection: {
-    background-color: theme('colors.primary / 20%');
-    color: transparent;
-  }
+  /* Selection styling is handled by ::selection pseudo-element below */
 }
 
 .syntax-textarea::selection {

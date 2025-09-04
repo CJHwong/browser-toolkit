@@ -78,46 +78,46 @@ done
 # Add cache-busting to the main docs/index.html
 echo "🔑 Adding cache-busting to main index.html..."
 if [ -f "docs/index.html" ]; then
-    # Create backup
-    cp "docs/index.html" "docs/index.html.backup"
-    
-    # Add cache-busting meta tags after <head>
-    sed -i '' 's|<head>|<head>\
-  <meta name="deployment-hash" content="'$HASH'">\
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">\
-  <meta http-equiv="Pragma" content="no-cache">\
-  <meta http-equiv="Expires" content="0">|' "docs/index.html"
-    
-    # Add cache-busting script before </head>
-    sed -i '' 's|</head>|\
-  <script>\
-    // Cache busting for deployment '$HASH'\
-    (function() {\
-      const deployHash = "'$HASH'";\
-      console.log("🚀 Main Index - Deployment:", deployHash);\
-      \
-      window.DEPLOYMENT_INFO = {\
-        hash: deployHash,\
-        buildTime: "'$BUILD_TIME'",\
-        tool: "main"\
-      };\
-      \
-      const lastDeployHash = localStorage.getItem("lastDeployHash_main");\
-      if (lastDeployHash && lastDeployHash !== deployHash) {\
-        console.log("🔄 New deployment detected for main index, clearing cache...");\
-        if ("caches" in window) {\
-          caches.keys().then(names => {\
-            names.forEach(name => caches.delete(name));\
-          });\
-        }\
-      }\
-      localStorage.setItem("lastDeployHash_main", deployHash);\
-    })();\
-  </script>\
-</head>|' "docs/index.html"
-    
-    # Clean up backup
-    rm "docs/index.html.backup"
+    # Add cache-busting meta tags and script using cross-platform approach
+    awk '
+      /<head>/ { 
+        print $0
+        print "  <meta name=\"deployment-hash\" content=\"'$HASH'\">"
+        print "  <meta http-equiv=\"Cache-Control\" content=\"no-cache, no-store, must-revalidate\">"
+        print "  <meta http-equiv=\"Pragma\" content=\"no-cache\">"
+        print "  <meta http-equiv=\"Expires\" content=\"0\">"
+        next
+      }
+      /<\/head>/ {
+        print "  <script>"
+        print "    // Cache busting for deployment '$HASH'"
+        print "    (function() {"
+        print "      const deployHash = \"'$HASH'\";"
+        print "      console.log(\"🚀 Main Index - Deployment:\", deployHash);"
+        print "      "
+        print "      window.DEPLOYMENT_INFO = {"
+        print "        hash: deployHash,"
+        print "        buildTime: \"'$BUILD_TIME'\","
+        print "        tool: \"main\""
+        print "      };"
+        print "      "
+        print "      const lastDeployHash = localStorage.getItem(\"lastDeployHash_main\");"
+        print "      if (lastDeployHash && lastDeployHash !== deployHash) {"
+        print "        console.log(\"🔄 New deployment detected for main index, clearing cache...\");"
+        print "        if (\"caches\" in window) {"
+        print "          caches.keys().then(names => {"
+        print "            names.forEach(name => caches.delete(name));"
+        print "          });"
+        print "        }"
+        print "      }"
+        print "      localStorage.setItem(\"lastDeployHash_main\", deployHash);"
+        print "    })();"
+        print "  </script>"
+        print $0
+        next
+      }
+      { print }
+    ' "docs/index.html" > "docs/index.html.tmp" && mv "docs/index.html.tmp" "docs/index.html"
     
     echo "   ✅ Enhanced main index.html with cache-busting"
 else
@@ -130,46 +130,46 @@ for tool_dir in docs/*/; do
 
     if [ -d "$tool_dir" ] && [ -f "$tool_dir/index.html" ]; then
         tool_name=$(basename "$tool_dir")
-        # Create backup
-        cp "$tool_dir/index.html" "$tool_dir/index.html.backup"
-        
-        # Add cache-busting meta tags after <head>
-        sed -i '' 's|<head>|<head>\
-  <meta name="deployment-hash" content="'$HASH'">\
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">\
-  <meta http-equiv="Pragma" content="no-cache">\
-  <meta http-equiv="Expires" content="0">|' "$tool_dir/index.html"
-        
-        # Add cache-busting script before </head>
-        sed -i '' 's|</head>|\
-  <script>\
-    // Cache busting for deployment '$HASH'\
-    (function() {\
-      const deployHash = "'$HASH'";\
-      console.log("🚀 '$tool_name' - Deployment:", deployHash);\
-      \
-      window.DEPLOYMENT_INFO = {\
-        hash: deployHash,\
-        buildTime: "'$BUILD_TIME'",\
-        tool: "'$tool_name'"\
-      };\
-      \
-      const lastDeployHash = localStorage.getItem("lastDeployHash_'$tool_name'");\
-      if (lastDeployHash \&\& lastDeployHash !== deployHash) {\
-        console.log("🔄 New deployment detected for '$tool_name', clearing cache...");\
-        if ("caches" in window) {\
-          caches.keys().then(names => {\
-            names.forEach(name => caches.delete(name));\
-          });\
-        }\
-      }\
-      localStorage.setItem("lastDeployHash_'$tool_name'", deployHash);\
-    })();\
-  </script>\
-</head>|' "$tool_dir/index.html"
-        
-        # Clean up backup
-        rm "$tool_dir/index.html.backup"
+        # Add cache-busting meta tags and script using cross-platform approach
+        awk '
+          /<head>/ { 
+            print $0
+            print "  <meta name=\"deployment-hash\" content=\"'$HASH'\">"
+            print "  <meta http-equiv=\"Cache-Control\" content=\"no-cache, no-store, must-revalidate\">"
+            print "  <meta http-equiv=\"Pragma\" content=\"no-cache\">"
+            print "  <meta http-equiv=\"Expires\" content=\"0\">"
+            next
+          }
+          /<\/head>/ {
+            print "  <script>"
+            print "    // Cache busting for deployment '$HASH'"
+            print "    (function() {"
+            print "      const deployHash = \"'$HASH'\";"
+            print "      console.log(\"🚀 '$tool_name' - Deployment:\", deployHash);"
+            print "      "
+            print "      window.DEPLOYMENT_INFO = {"
+            print "        hash: deployHash,"
+            print "        buildTime: \"'$BUILD_TIME'\","
+            print "        tool: \"'$tool_name'\""
+            print "      };"
+            print "      "
+            print "      const lastDeployHash = localStorage.getItem(\"lastDeployHash_'$tool_name'\");"
+            print "      if (lastDeployHash && lastDeployHash !== deployHash) {"
+            print "        console.log(\"🔄 New deployment detected for '$tool_name', clearing cache...\");"
+            print "        if (\"caches\" in window) {"
+            print "          caches.keys().then(names => {"
+            print "            names.forEach(name => caches.delete(name));"
+            print "          });"
+            print "        }"
+            print "      }"
+            print "      localStorage.setItem(\"lastDeployHash_'$tool_name'\", deployHash);"
+            print "    })();"
+            print "  </script>"
+            print $0
+            next
+          }
+          { print }
+        ' "$tool_dir/index.html" > "$tool_dir/index.html.tmp" && mv "$tool_dir/index.html.tmp" "$tool_dir/index.html"
         
         echo "   ✅ Enhanced $tool_name with cache-busting"
     fi
