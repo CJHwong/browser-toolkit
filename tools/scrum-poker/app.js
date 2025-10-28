@@ -384,13 +384,52 @@ function render(sessionData) {
   // Handle suggestion display and card disabling
   if (sessionData.isRevealed) {
     suggestionContainer.classList.remove('hidden');
-    const suggestion = calculateSuggestion(users);
-    suggestionValue.textContent = suggestion;
-    if (suggestion.length > 5) {
+    const analysis = analyzeVotes(users);
+    suggestionValue.textContent = analysis.suggestion;
+    if (analysis.suggestion.length > 5) {
       suggestionValue.classList.add('long-text');
     } else {
       suggestionValue.classList.remove('long-text');
     }
+
+    // Display reasoning
+    const reasoningEl = document.getElementById('suggestion-reasoning');
+    if (reasoningEl) {
+      reasoningEl.textContent = analysis.reasoning;
+    }
+
+    // Display vote distribution
+    const distributionEl = document.getElementById('vote-distribution');
+    if (distributionEl) {
+      distributionEl.innerHTML = '';
+      const sortedVotes = Object.entries(analysis.distribution).sort(
+        (a, b) => b[1] - a[1]
+      );
+
+      sortedVotes.forEach(([vote, count]) => {
+        const bar = document.createElement('div');
+        bar.className = 'distribution-bar';
+
+        const label = document.createElement('span');
+        label.className = 'distribution-label';
+        label.textContent = vote;
+
+        const barFill = document.createElement('div');
+        barFill.className = 'distribution-fill';
+        const percentage = (count / Object.values(users).length) * 100;
+        barFill.style.width = `${percentage}%`;
+
+        const countLabel = document.createElement('span');
+        countLabel.className = 'distribution-count';
+        countLabel.textContent = count;
+
+        bar.appendChild(label);
+        bar.appendChild(barFill);
+        bar.appendChild(countLabel);
+        distributionEl.appendChild(bar);
+      });
+    }
+
     cardsContainer.classList.add('disabled');
   } else {
     suggestionContainer.classList.add('hidden');
@@ -399,50 +438,125 @@ function render(sessionData) {
 }
 
 /**
- * Calculates a suggested vote based on the revealed results.
+ * Calculates vote statistics and distribution.
  * @param {object} users - The user objects from the session data.
- * @returns {string} The suggested value or "Discuss".
+ * @returns {object} Vote statistics and reasoning.
  */
-function calculateSuggestion(users) {
+function analyzeVotes(users) {
   const allVotes = Object.values(users)
     .map(u => u.vote)
     .filter(v => v != null);
 
   if (allVotes.length === 0) {
-    return '-';
+    return {
+      suggestion: '-',
+      reasoning: 'No votes yet',
+      distribution: {},
+    };
   }
 
-  // 1. Check for coffee break
-  const coffeeVotesCount = allVotes.filter(v => v === '☕').length;
-  if (coffeeVotesCount > allVotes.length / 2) {
-    return "Let's take a break";
-  }
-
-  // 2. Check for major disagreement
-  const uniqueVotes = [...new Set(allVotes)];
-  if (uniqueVotes.length > 2) {
-    return 'Discuss';
-  }
-
-  // 3. If not major disagreement, calculate suggestion
-  const numericVotes = allVotes.filter(v => !isNaN(v)).map(v => Number(v));
-
-  if (numericVotes.length === 0) {
-    // Only non-numeric votes left (e.g., ['?'] or ['?', '☕'])
-    return uniqueVotes.join(' / '); // e.g. "? / ☕"
-  }
-
-  const average =
-    numericVotes.reduce((sum, vote) => sum + vote, 0) / numericVotes.length;
-
-  const numericPokerCards = pokerCards.filter(c => !isNaN(c)).map(Number);
-
-  // Find the closest valid card value to the average
-  const closest = numericPokerCards.reduce((prev, curr) => {
-    return Math.abs(curr - average) < Math.abs(prev - average) ? curr : prev;
+  // Build vote distribution
+  const distribution = {};
+  allVotes.forEach(vote => {
+    distribution[vote] = (distribution[vote] || 0) + 1;
   });
 
-  return closest.toString();
+  // Separate numeric and special votes
+  const numericVotes = allVotes.filter(v => !isNaN(v)).map(v => Number(v));
+  const coffeeCount = allVotes.filter(v => v === '☕').length;
+  const uncertainCount = allVotes.filter(v => v === '?').length;
+
+  // Rule 1: Coffee break majority (>50%)
+  if (coffeeCount > allVotes.length / 2) {
+    return {
+      suggestion: "Let's take a break",
+      reasoning: `${coffeeCount}/${allVotes.length} voted for coffee break`,
+      distribution,
+    };
+  }
+
+  // Rule 2: Uncertainty majority (>50%)
+  if (uncertainCount > allVotes.length / 2) {
+    return {
+      suggestion: 'Discuss & Re-vote',
+      reasoning: `${uncertainCount}/${allVotes.length} voted uncertain (?)`,
+      distribution,
+    };
+  }
+
+  // Rule 3: No numeric votes
+  if (numericVotes.length === 0) {
+    const uniqueVotes = [...new Set(allVotes)];
+    return {
+      suggestion: uniqueVotes.join(' / '),
+      reasoning: 'No numeric votes cast',
+      distribution,
+    };
+  }
+
+  // Rule 4: Check for majority consensus (>50% same numeric vote)
+  const numericDistribution = {};
+  numericVotes.forEach(vote => {
+    numericDistribution[vote] = (numericDistribution[vote] || 0) + 1;
+  });
+
+  const maxCount = Math.max(...Object.values(numericDistribution));
+  if (maxCount > numericVotes.length / 2) {
+    const consensusValue = Object.keys(numericDistribution).find(
+      key => numericDistribution[key] === maxCount
+    );
+    return {
+      suggestion: consensusValue,
+      reasoning: `Majority consensus: ${maxCount}/${numericVotes.length} votes`,
+      distribution,
+    };
+  }
+
+  // Rule 5: Check vote spread - if range > 3 Fibonacci steps, discuss
+  const sortedVotes = [...numericVotes].sort((a, b) => a - b);
+  const min = sortedVotes[0];
+  const max = sortedVotes[sortedVotes.length - 1];
+  const numericPokerCards = pokerCards.filter(c => !isNaN(c)).map(Number);
+
+  const minIndex = numericPokerCards.indexOf(min);
+  const maxIndex = numericPokerCards.indexOf(max);
+  const fibonacciSteps = maxIndex - minIndex;
+
+  if (fibonacciSteps > 3) {
+    return {
+      suggestion: 'Discuss',
+      reasoning: `Large spread: ${min} to ${max} (${fibonacciSteps} steps apart)`,
+      distribution,
+    };
+  }
+
+  // Rule 6: Use median for better outlier resistance
+  const median =
+    numericVotes.length % 2 === 0
+      ? (sortedVotes[numericVotes.length / 2 - 1] +
+          sortedVotes[numericVotes.length / 2]) /
+        2
+      : sortedVotes[Math.floor(numericVotes.length / 2)];
+
+  // Rule 7: Round to nearest Fibonacci value (favor lower on exact tie)
+  const closest = numericPokerCards.reduce((prev, curr) => {
+    const prevDiff = Math.abs(prev - median);
+    const currDiff = Math.abs(curr - median);
+    if (prevDiff === currDiff) {
+      return prev < curr ? prev : curr; // Favor lower on tie
+    }
+    return currDiff < prevDiff ? curr : prev;
+  });
+
+  const avg = (
+    numericVotes.reduce((sum, v) => sum + v, 0) / numericVotes.length
+  ).toFixed(1);
+
+  return {
+    suggestion: closest.toString(),
+    reasoning: `Median: ${median}, Avg: ${avg} → Round to ${closest}`,
+    distribution,
+  };
 }
 
 /**
@@ -542,6 +656,11 @@ function newRound() {
     }
 
     sessionRef.update(updates).catch(handleDatabaseError);
+
+    // Clear card selection visual state
+    document
+      .querySelectorAll('.card')
+      .forEach(c => c.classList.remove('selected'));
   });
 }
 
@@ -587,6 +706,33 @@ window.renameUser = function renameUser() {
 joinBtn.addEventListener('click', joinSession);
 revealBtn.addEventListener('click', revealVotes);
 resetBtn.addEventListener('click', newRound);
+
+// Suggestion help modal
+const suggestionHelpBtn = document.getElementById('suggestion-help-btn');
+const suggestionHelpModal = document.getElementById('suggestion-help-modal');
+const suggestionHelpCloseBtn = document.getElementById(
+  'suggestion-help-close-btn'
+);
+
+if (suggestionHelpBtn) {
+  suggestionHelpBtn.addEventListener('click', () => {
+    suggestionHelpModal.classList.remove('hidden');
+  });
+}
+
+if (suggestionHelpCloseBtn) {
+  suggestionHelpCloseBtn.addEventListener('click', () => {
+    suggestionHelpModal.classList.add('hidden');
+  });
+}
+
+if (suggestionHelpModal) {
+  suggestionHelpModal.addEventListener('click', e => {
+    if (e.target === suggestionHelpModal) {
+      suggestionHelpModal.classList.add('hidden');
+    }
+  });
+}
 
 createSessionBtn.addEventListener('click', () => {
   const name = nameInput.value.trim();

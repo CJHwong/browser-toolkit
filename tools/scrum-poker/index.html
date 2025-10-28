@@ -115,12 +115,40 @@
               <button id="reset-btn">New Round</button>
             </div>
             <div id="suggestion-container" class="hidden">
-              <h2>Suggestion</h2>
+              <h2>
+                Suggestion
+                <button
+                  id="suggestion-help-btn"
+                  class="help-btn"
+                  title="How is this calculated?"
+                >
+                  ?
+                </button>
+              </h2>
               <div id="suggestion-value"></div>
+              <div id="suggestion-reasoning" class="suggestion-reasoning"></div>
+              <div id="vote-distribution" class="vote-distribution"></div>
             </div>
           </div>
         </div>
       </main>
+    </div>
+
+    <!-- Suggestion Algorithm Help Modal -->
+    <div id="suggestion-help-modal" class="hidden">
+      <div id="suggestion-help-content">
+        <h3>How Suggestions Work</h3>
+        <ol>
+          <li>If majority votes ☕ or ? → Take action on that</li>
+          <li>If >50% agree on a number → Use that number</li>
+          <li>If votes too spread out → "Discuss"</li>
+          <li>Otherwise → Use median, round to nearest Fibonacci</li>
+        </ol>
+        <p class="help-note">
+          The reasoning below shows the calculation details.
+        </p>
+        <button id="suggestion-help-close-btn">Got it!</button>
+      </div>
     </div>
 
     <!-- Firebase SDK -->
