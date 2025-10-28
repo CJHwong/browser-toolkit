@@ -19,7 +19,7 @@
               ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length < 50"
             },
             "vote": {
-              ".validate": "newData.val() === null || (newData.isString() && (newData.val() === '0' || newData.val() === '1' || newData.val() === '2' || newData.val() === '3' || newData.val() === '5' || newData.val() === '8' || newData.val() === '13' || newData.val() === '21' || newData.val() === '?' || newData.val() === '☕'))"
+              ".validate": "newData.val() === null || (newData.isString() && (newData.val() === '0.5' || newData.val() === '1' || newData.val() === '2' || newData.val() === '3' || newData.val() === '5' || newData.val() === '8' || newData.val() === '13' || newData.val() === '21' || newData.val() === '?' || newData.val() === '☕'))"
             },
             "hasVoted": {
               ".validate": "newData.isBoolean()"
