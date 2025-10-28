@@ -31,10 +31,23 @@ let sessionId = null;
 let userId = null;
 let sessionRef = null;
 let database = null;
-let isSessionCreator = false;
 const pokerCards = ['0.5', '1', '2', '3', '5', '8', '13', '21', '?', '☕'];
 
 // --- Core Functions ---
+
+/**
+ * Hides the loading overlay with a fade-out animation.
+ */
+function hideLoadingOverlay() {
+  const overlay = document.getElementById('loading-overlay');
+  if (overlay) {
+    overlay.classList.add('fade-out');
+    // Remove from DOM after animation completes
+    setTimeout(() => {
+      overlay.style.display = 'none';
+    }, 300);
+  }
+}
 
 /**
  * Handles database errors, showing an alert to the user.
@@ -215,19 +228,6 @@ function init() {
   const urlParams = new URLSearchParams(window.location.search);
   sessionId = urlParams.get('session');
 
-  if (sessionId) {
-    // Join existing session
-    sessionRef = database.ref(`scrum-poker-sessions/${sessionId}`);
-    updateSessionUrl();
-    listenForSessionChanges();
-  } else {
-    // No session, user must create one.
-    document.getElementById('session-info').classList.add('hidden');
-    joinBtn.disabled = true;
-  }
-
-  generatePokerCards();
-
   // Check if user ID is already in localStorage
   userId = localStorage.getItem('scrum_poker_global_userid');
   if (!userId) {
@@ -240,6 +240,43 @@ function init() {
   if (savedName) {
     nameInput.value = savedName;
   }
+
+  if (sessionId) {
+    // Join existing session
+    sessionRef = database.ref(`scrum-poker-sessions/${sessionId}`);
+    updateSessionUrl();
+    listenForSessionChanges();
+
+    // Auto-join if user has a saved name
+    if (savedName) {
+      // Check if user is already in the session before auto-joining
+      sessionRef
+        .once('value')
+        .then(snapshot => {
+          const sessionData = snapshot.val();
+          if (sessionData && !sessionData.users?.[userId]) {
+            // User is not in session yet, auto-join
+            joinSession();
+          }
+          // Hide loading after checking session
+          hideLoadingOverlay();
+        })
+        .catch(error => {
+          console.error('Error checking session:', error);
+          hideLoadingOverlay();
+        });
+    } else {
+      // No saved name, show join screen immediately
+      hideLoadingOverlay();
+    }
+  } else {
+    // No session, user must create one.
+    document.getElementById('session-info').classList.add('hidden');
+    joinBtn.disabled = true;
+    hideLoadingOverlay();
+  }
+
+  generatePokerCards();
 }
 
 /**
@@ -308,9 +345,6 @@ function render(sessionData) {
     pokerRoomSection.classList.add('hidden');
   }
 
-  // Check if current user is session creator
-  isSessionCreator = sessionData.creatorId === userId;
-
   // Render participants
   participantsList.innerHTML = '';
   for (const id in users) {
@@ -328,14 +362,21 @@ function render(sessionData) {
       voteDisplay = `<span class="vote-status ${statusClass}">${status}</span>`;
     }
 
-    // Create kick button for session creator (but not for themselves)
-    let kickButton = '';
-    if (isSessionCreator && id !== userId) {
-      kickButton = `<button class="kick-btn" onclick="kickUser('${id}')" title="Remove user">×</button>`;
+    // Create action buttons
+    let actionButtons = '';
+
+    // Rename button for current user
+    if (id === userId) {
+      actionButtons += `<button class="rename-btn" onclick="renameUser()" title="Rename">✎</button>`;
+    }
+
+    // Kick button for other users
+    if (id !== userId) {
+      actionButtons += `<button class="kick-btn" onclick="kickUser('${id}')" title="Remove user">×</button>`;
     }
 
     // XSS Fix: Use textContent for user-provided names
-    li.innerHTML = `<div class="participant-info"><span></span> ${voteDisplay}</div>${kickButton}`;
+    li.innerHTML = `<div class="participant-info"><span></span> ${voteDisplay}</div>${actionButtons}`;
     li.querySelector('span').textContent = user.name;
     participantsList.appendChild(li);
   }
@@ -505,20 +546,39 @@ function newRound() {
 }
 
 /**
- * Kicks a user from the session (only available to session creator).
+ * Kicks a user from the session (available to all users).
  * @param {string} userIdToKick - The ID of the user to remove.
  */
 window.kickUser = function kickUser(userIdToKick) {
-  if (!isSessionCreator) {
-    alert('Only the session creator can remove users.');
-    return;
-  }
-
   if (confirm('Are you sure you want to remove this user from the session?')) {
     sessionRef
       .child('users')
       .child(userIdToKick)
       .remove()
+      .catch(handleDatabaseError);
+  }
+};
+
+/**
+ * Allows the current user to rename themselves.
+ */
+window.renameUser = function renameUser() {
+  const currentName = localStorage.getItem('scrum_poker_username') || '';
+
+  const newName = prompt('Enter your new name:', currentName);
+
+  if (newName && newName.trim() && newName.trim() !== currentName) {
+    const trimmedName = newName.trim();
+    // Update localStorage
+    localStorage.setItem('scrum_poker_username', trimmedName);
+
+    // Update in database
+    sessionRef
+      .child('users')
+      .child(userId)
+      .update({
+        name: trimmedName,
+      })
       .catch(handleDatabaseError);
   }
 };
@@ -659,10 +719,12 @@ fetch('firebase-config.json')
       })
       .catch(error => {
         console.error('Anonymous sign-in failed:', error);
+        hideLoadingOverlay();
         alert('Could not connect to the session. Please refresh the page.');
       });
   })
   .catch(error => {
     console.error('Initialization failed:', error);
+    hideLoadingOverlay();
     alert(`Error: ${error.message}`);
   });
