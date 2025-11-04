@@ -790,7 +790,6 @@ button:disabled {
 }
 
 .distribution-fill {
-  flex-grow: 1;
   height: 24px;
   background: linear-gradient(
     90deg,

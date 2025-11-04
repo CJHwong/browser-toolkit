@@ -406,6 +406,8 @@ function render(sessionData) {
         (a, b) => b[1] - a[1]
       );
 
+      const totalVotes = sortedVotes.reduce((sum, [, count]) => sum + count, 0);
+
       sortedVotes.forEach(([vote, count]) => {
         const bar = document.createElement('div');
         bar.className = 'distribution-bar';
@@ -416,7 +418,7 @@ function render(sessionData) {
 
         const barFill = document.createElement('div');
         barFill.className = 'distribution-fill';
-        const percentage = (count / Object.values(users).length) * 100;
+        const percentage = (count / totalVotes) * 100;
         barFill.style.width = `${percentage}%`;
 
         const countLabel = document.createElement('span');
@@ -434,6 +436,21 @@ function render(sessionData) {
   } else {
     suggestionContainer.classList.add('hidden');
     cardsContainer.classList.remove('disabled');
+
+    // Sync card selection with current user's vote
+    document
+      .querySelectorAll('.card')
+      .forEach(c => c.classList.remove('selected'));
+
+    const currentUser = users[userId];
+    if (currentUser && currentUser.vote != null) {
+      const selectedCard = document.querySelector(
+        `.card[data-value="${currentUser.vote}"]`
+      );
+      if (selectedCard) {
+        selectedCard.classList.add('selected');
+      }
+    }
   }
 }
 
