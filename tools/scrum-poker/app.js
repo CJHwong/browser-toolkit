@@ -302,7 +302,7 @@ function init() {
 function updateSessionUrl() {
   const url = window.location.href;
   sessionUrlLink.href = url;
-  sessionUrlLink.textContent = `Session: ${sessionId}`;
+  sessionUrlLink.textContent = sessionId;
 
   // Generate and set QR codes
   const qrUrl = generateQRCode(url);
