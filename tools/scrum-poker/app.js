@@ -26,12 +26,29 @@ const bookmarkletLink = document.getElementById('bookmarklet-link');
 const bookmarkletCode = document.getElementById('bookmarklet-code');
 const copyBookmarkletBtn = document.getElementById('copy-bookmarklet-btn');
 
+// New DOM Elements
+const autoRevealOverlay = document.getElementById('auto-reveal-countdown');
+const countdownNumber = document.getElementById('countdown-number');
+const cancelRevealBtn = document.getElementById('cancel-reveal-btn');
+const confettiCanvas = document.getElementById('confetti-canvas');
+const notificationToast = document.getElementById('notification-toast');
+const notificationMessage = document.getElementById('notification-message');
+const notificationClose = document.getElementById('notification-close');
+
 // --- App State ---
 let sessionId = null;
 let userId = null;
 let sessionRef = null;
 let database = null;
 const pokerCards = ['0.5', '1', '2', '3', '5', '8', '13', '21', '?', '☕'];
+
+// Feature State
+let autoRevealTimeout = null;
+let autoRevealInterval = null;
+let autoRevealDismissed = false;
+let lastVotedCount = 0;
+let nudgeShown = false;
+let hasShownConsensus = false;
 
 // --- Core Functions ---
 
@@ -330,6 +347,208 @@ function listenForSessionChanges() {
 }
 
 /**
+ * Checks if auto-reveal should be triggered (Local Countdown).
+ * @param {object} sessionData
+ */
+function checkAutoReveal(sessionData) {
+  if (sessionData.isRevealed) {
+    cancelAutoReveal(false);
+    return;
+  }
+
+  const users = sessionData.users || {};
+  const userIds = Object.keys(users).sort();
+  const totalUsers = userIds.length;
+  const votedUsers = userIds.filter(id => users[id].hasVoted).length;
+
+  // Reset dismissed state if vote count drops
+  if (votedUsers < lastVotedCount) {
+    autoRevealDismissed = false;
+  }
+  lastVotedCount = votedUsers;
+
+  if (
+    totalUsers > 1 &&
+    votedUsers === totalUsers &&
+    !autoRevealDismissed &&
+    !autoRevealInterval
+  ) {
+    startLocalAutoReveal(sessionData);
+  } else if (votedUsers !== totalUsers) {
+    cancelAutoReveal(false);
+  }
+}
+
+function startLocalAutoReveal(sessionData) {
+  autoRevealOverlay.classList.remove('hidden');
+  let timeLeft = 3;
+  countdownNumber.textContent = timeLeft;
+
+  autoRevealInterval = setInterval(() => {
+    timeLeft--;
+    if (timeLeft > 0) {
+      countdownNumber.textContent = timeLeft;
+    } else {
+      countdownNumber.textContent = '0';
+      clearInterval(autoRevealInterval);
+      autoRevealInterval = null;
+
+      // Only the leader (or creator) triggers the actual DB update
+      const leaderId = Object.keys(sessionData.users || {}).sort()[0];
+      if (userId === leaderId || userId === sessionData.creatorId) {
+        console.log('Local timer finished. Triggering reveal...');
+        revealVotes();
+      }
+      
+      autoRevealOverlay.classList.add('hidden');
+    }
+  }, 1000);
+}
+
+function cancelAutoReveal(dismissed = true) {
+  if (autoRevealInterval) {
+    clearInterval(autoRevealInterval);
+    autoRevealInterval = null;
+  }
+  autoRevealOverlay.classList.add('hidden');
+  if (dismissed) {
+    autoRevealDismissed = true;
+  }
+}
+
+/**
+ * Checks if a nudge notification should be shown to the current user.
+ * @param {object} sessionData
+ */
+function checkVoteNudge(sessionData) {
+  if (sessionData.isRevealed) {
+    hideNotification();
+    return;
+  }
+
+  const users = sessionData.users || {};
+  const currentUser = users[userId];
+
+  if (!currentUser || currentUser.hasVoted || nudgeShown) return;
+
+  const userIds = Object.keys(users);
+  const totalUsers = userIds.length;
+  if (totalUsers < 3) return; // Don't nudge in very small groups
+
+  const votedCount = userIds.filter(id => users[id].hasVoted).length;
+  const participationRate = votedCount / totalUsers;
+
+  if (participationRate >= 0.75) {
+    showNotification('Waiting on you! Most of the team has voted.');
+    nudgeShown = true;
+  }
+}
+
+/**
+ * Checks if consensus has been reached and triggers animation.
+ * @param {object} sessionData
+ */
+function checkConsensus(sessionData) {
+  if (!sessionData.isRevealed) {
+    hasShownConsensus = false;
+    return;
+  }
+
+  if (hasShownConsensus) return;
+
+  const users = sessionData.users || {};
+  const votes = Object.values(users)
+    .map(u => u.vote)
+    .filter(v => v != null);
+
+  if (votes.length < 2) return;
+
+  // Check if all votes are the same
+  const firstVote = votes[0];
+  const allSame = votes.every(v => v === firstVote);
+
+  if (allSame) {
+    triggerConfetti();
+    hasShownConsensus = true;
+  }
+}
+
+/**
+ * Triggers a confetti animation on the canvas.
+ */
+function triggerConfetti() {
+  const ctx = confettiCanvas.getContext('2d');
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+
+  const particles = [];
+  const particleCount = 150;
+  const colors = ['#607d8b', '#ffeb3b', '#ff5722', '#4caf50', '#2196f3'];
+
+  for (let i = 0; i < particleCount; i++) {
+    particles.push({
+      x: Math.random() * confettiCanvas.width,
+      y: Math.random() * confettiCanvas.height - confettiCanvas.height,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      size: Math.random() * 8 + 4,
+      speedY: Math.random() * 3 + 2,
+      speedX: Math.random() * 2 - 1,
+      angle: Math.random() * 360,
+      spin: Math.random() * 10 - 5,
+    });
+  }
+
+  let animationFrame;
+
+  function animate() {
+    ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+    let activeParticles = 0;
+
+    particles.forEach(p => {
+      p.y += p.speedY;
+      p.x += p.speedX;
+      p.angle += p.spin;
+
+      if (p.y < confettiCanvas.height) {
+        activeParticles++;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate((p.angle * Math.PI) / 180);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+        ctx.restore();
+      }
+    });
+
+    if (activeParticles > 0) {
+      animationFrame = requestAnimationFrame(animate);
+    } else {
+      ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+    }
+  }
+
+  animate();
+}
+
+function showNotification(msg) {
+  notificationMessage.textContent = msg;
+  notificationToast.classList.remove('hidden');
+}
+
+function hideNotification() {
+  notificationToast.classList.add('hidden');
+}
+
+function resetFeatureState() {
+  nudgeShown = false;
+  hasShownConsensus = false;
+  autoRevealDismissed = false;
+  lastVotedCount = 0;
+  cancelAutoReveal(false);
+  hideNotification();
+}
+
+/**
  * Renders the entire UI based on the current session state.
  * @param {object} sessionData - The data for the current session from Firebase.
  */
@@ -452,6 +671,11 @@ function render(sessionData) {
       }
     }
   }
+
+  // Feature Checks
+  checkAutoReveal(sessionData);
+  checkVoteNudge(sessionData);
+  checkConsensus(sessionData);
 }
 
 /**
@@ -661,6 +885,8 @@ function newRound() {
     const sessionData = snapshot.val();
     if (!sessionData) return; // Session doesn't exist, do nothing.
 
+    resetFeatureState();
+
     const updates = {
       isRevealed: false,
     };
@@ -723,6 +949,12 @@ window.renameUser = function renameUser() {
 joinBtn.addEventListener('click', joinSession);
 revealBtn.addEventListener('click', revealVotes);
 resetBtn.addEventListener('click', newRound);
+
+cancelRevealBtn.addEventListener('click', () => {
+  cancelAutoReveal(true);
+});
+
+notificationClose.addEventListener('click', hideNotification);
 
 // Suggestion help modal
 const suggestionHelpBtn = document.getElementById('suggestion-help-btn');

@@ -151,6 +151,24 @@
       </div>
     </div>
 
+    <!-- Auto-Reveal Countdown Overlay -->
+    <div id="auto-reveal-countdown" class="hidden">
+      <div class="countdown-content">
+        <h3>All votes in!</h3>
+        <div class="timer">Revealing in <span id="countdown-number">3</span>...</div>
+        <button id="cancel-reveal-btn">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Confetti Container -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Notification Toast -->
+    <div id="notification-toast" class="hidden">
+      <p id="notification-message"></p>
+      <button id="notification-close">×</button>
+    </div>
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-app-check-compat.js"></script>
