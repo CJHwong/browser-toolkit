@@ -11,6 +11,9 @@ export default [
       'eslint.config.mjs',
       'tools/markslide-studio/src/theme/*.js',
       'tools/markslide-studio/src/utils/*.js',
+      'tools/video-subtitler/app.js',
+      'tools/video-subtitler/ffmpeg-utils.js',
+      'tools/video-subtitler/subtitle-editor.js',
     ],
     languageOptions: {
       ecmaVersion: 2024,
@@ -21,6 +24,18 @@ export default [
         console: 'readonly',
         Event: 'readonly',
         process: 'readonly',
+        URL: 'readonly',
+        Blob: 'readonly',
+        Worker: 'readonly',
+        TextEncoder: 'readonly',
+        DataView: 'readonly',
+        Float32Array: 'readonly',
+        Uint8Array: 'readonly',
+        alert: 'readonly',
+        FFmpegWASM: 'readonly',
+        FFmpegUtil: 'readonly',
+        setTimeout: 'readonly',
+        fetch: 'readonly',
       },
     },
     rules: {
@@ -92,6 +107,25 @@ export default [
     },
   },
 
+  // Web Worker files
+  {
+    files: ['tools/video-subtitler/whisper-worker.js'],
+    languageOptions: {
+      ecmaVersion: 2024,
+      sourceType: 'module',
+      globals: {
+        self: 'readonly',
+        console: 'readonly',
+      },
+    },
+    rules: {
+      'no-unused-vars': 'warn',
+      'no-console': 'off',
+      'prefer-const': 'warn',
+      'no-var': 'error',
+    },
+  },
+
   // Node.js config files
   {
     files: [
@@ -122,6 +156,11 @@ export default [
     ignores: [
       'tools/markslide-studio/src/theme/*.js',
       'tools/markslide-studio/src/utils/*.js',
+      'tools/video-subtitler/app.js',
+      'tools/video-subtitler/ffmpeg-utils.js',
+      'tools/video-subtitler/subtitle-editor.js',
+      'tools/video-subtitler/whisper-worker.js',
+      'tools/video-subtitler/coi-serviceworker.js',
     ],
     languageOptions: {
       ecmaVersion: 2024,
@@ -198,6 +237,8 @@ export default [
       'docs/**', // Ignore built docs folder completely
       'dist/**', // Ignore built dist folder
       '**/*.min.js',
+      'tools/video-subtitler/coi-serviceworker.js',
+      'tools/video-subtitler/vendor/**',
       '**/*.html',
       'remove-secrets-from-history.sh',
       'eslint.config.mjs',

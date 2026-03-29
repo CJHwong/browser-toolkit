@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Video Subtitler</title>
+    <script src="coi-serviceworker.js"></script>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="subtitle-editor.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header>
+        <h1>Video Subtitler</h1>
+        <p>
+          Transcribe videos and add subtitles using AI, entirely in your
+          browser. No data leaves your machine.
+        </p>
+      </header>
+
+      <main>
+        <div class="workspace">
+          <div class="video-panel">
+            <div id="drop-zone" class="drop-zone">
+              <span class="drop-zone-icon">&#127909;</span>
+              <span class="drop-zone-text"
+                >Drop a video file here or click to browse</span
+              >
+              <input
+                type="file"
+                id="file-input"
+                accept="video/*"
+                hidden
+              />
+            </div>
+
+            <video id="video-preview" controls hidden></video>
+
+            <div id="progress-section" class="progress-section hidden">
+              <div id="model-progress" class="progress-group hidden">
+                <label>Downloading model...</label>
+                <div class="progress-bar">
+                  <div id="model-progress-fill" class="progress-fill"></div>
+                </div>
+                <span id="model-progress-text" class="progress-text">0%</span>
+              </div>
+
+              <div id="transcription-spinner" class="progress-group hidden">
+                <label>Transcribing...</label>
+                <div class="spinner"></div>
+              </div>
+
+              <div id="export-progress" class="progress-group hidden">
+                <label>Burning subtitles into video...</label>
+                <div class="progress-bar">
+                  <div id="export-progress-fill" class="progress-fill"></div>
+                </div>
+                <span id="export-progress-text" class="progress-text">0%</span>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button id="transcribe-btn" disabled>Transcribe</button>
+              <button id="export-btn" disabled>Export</button>
+            </div>
+          </div>
+
+          <div class="editor-panel">
+            <div id="subtitle-editor-container"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script src="vendor/ffmpeg.js"></script>
+    <script src="vendor/ffmpeg-util.js"></script>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
