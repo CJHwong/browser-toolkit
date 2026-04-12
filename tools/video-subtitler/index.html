@@ -11,8 +11,8 @@
   <body>
     <div id="app">
       <header>
-        <h1>Video Subtitler</h1>
-        <p>
+        <h1 data-i18n="title">Video Subtitler</h1>
+        <p data-i18n="subtitle">
           Transcribe videos and add subtitles using AI, entirely in your
           browser. No data leaves your machine.
         </p>
@@ -23,7 +23,7 @@
           <div class="video-panel">
             <div id="drop-zone" class="drop-zone">
               <span class="drop-zone-icon">&#127909;</span>
-              <span class="drop-zone-text"
+              <span class="drop-zone-text" data-i18n="drop.hint"
                 >Drop a video file here or click to browse</span
               >
               <input
@@ -38,20 +38,23 @@
 
             <div id="progress-section" class="progress-section hidden">
               <div id="model-progress" class="progress-group hidden">
-                <label>Downloading model...</label>
+                <label data-i18n="progress.model">Downloading model...</label>
                 <div class="progress-bar">
                   <div id="model-progress-fill" class="progress-fill"></div>
                 </div>
                 <span id="model-progress-text" class="progress-text">0%</span>
               </div>
 
-              <div id="transcription-spinner" class="progress-group hidden">
-                <label>Transcribing...</label>
-                <div class="spinner"></div>
+              <div id="transcription-progress" class="progress-group hidden">
+                <label data-i18n="progress.transcribe">Transcribing...</label>
+                <div class="progress-bar">
+                  <div id="transcription-progress-fill" class="progress-fill"></div>
+                </div>
+                <span id="transcription-progress-text" class="progress-text">0%</span>
               </div>
 
               <div id="export-progress" class="progress-group hidden">
-                <label>Burning subtitles into video...</label>
+                <label data-i18n="progress.export">Burning subtitles into video...</label>
                 <div class="progress-bar">
                   <div id="export-progress-fill" class="progress-fill"></div>
                 </div>
@@ -60,8 +63,17 @@
             </div>
 
             <div class="actions">
-              <button id="transcribe-btn" disabled>Transcribe</button>
-              <button id="export-btn" disabled>Export</button>
+              <div class="lang-select">
+                <label data-i18n="lang.label">Language</label>
+                <select id="whisper-lang">
+                  <option value="zh">中文</option>
+                  <option value="en">English</option>
+                  <option value="ja">日本語</option>
+                  <option value="ko">한국어</option>
+                </select>
+              </div>
+              <button id="transcribe-btn" disabled data-i18n="btn.transcribe">Transcribe</button>
+              <button id="export-btn" disabled data-i18n="btn.export">Export</button>
             </div>
           </div>
 

@@ -1,5 +1,6 @@
 import { initFFmpeg, extractAudio, burnSubtitles, generateASS } from './ffmpeg-utils.js';
 import SubtitleEditor from './subtitle-editor.js';
+import { t, getLocale } from './i18n.js';
 
 const State = {
   IDLE: 'idle',
@@ -16,7 +17,9 @@ const progressSection = document.getElementById('progress-section');
 const modelProgress = document.getElementById('model-progress');
 const modelProgressFill = document.getElementById('model-progress-fill');
 const modelProgressText = document.getElementById('model-progress-text');
-const transcriptionSpinner = document.getElementById('transcription-spinner');
+const transcriptionProgress = document.getElementById('transcription-progress');
+const transcriptionProgressFill = document.getElementById('transcription-progress-fill');
+const transcriptionProgressText = document.getElementById('transcription-progress-text');
 const exportProgress = document.getElementById('export-progress');
 const exportProgressFill = document.getElementById('export-progress-fill');
 const exportProgressText = document.getElementById('export-progress-text');
@@ -24,10 +27,26 @@ const transcribeBtn = document.getElementById('transcribe-btn');
 const exportBtn = document.getElementById('export-btn');
 const editorContainer = document.getElementById('subtitle-editor-container');
 
+const whisperLang = document.getElementById('whisper-lang');
+
 let currentState = State.IDLE;
 let videoFile = null;
 let worker = null;
-const editor = new SubtitleEditor(editorContainer);
+const editor = new SubtitleEditor(editorContainer, t);
+
+// -- i18n --
+
+function applyTranslations() {
+  const locale = getLocale();
+  document.documentElement.lang = locale === 'zh-TW' ? 'zh-TW' : 'en';
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.textContent = t(el.dataset.i18n);
+  });
+  // Default whisper language to match UI locale
+  whisperLang.value = locale === 'zh-TW' ? 'zh' : 'en';
+}
+
+applyTranslations();
 
 editor.onSegmentClick((segment) => {
   videoPreview.currentTime = segment.start;
@@ -78,7 +97,11 @@ function setState(state) {
 
   progressSection.classList.toggle('hidden', state === State.IDLE || state === State.EDITING);
   modelProgress.classList.toggle('hidden', state !== State.DOWNLOADING_MODEL);
-  transcriptionSpinner.classList.toggle('hidden', state !== State.TRANSCRIBING);
+  transcriptionProgress.classList.toggle('hidden', state !== State.TRANSCRIBING);
+  if (state === State.TRANSCRIBING) {
+    transcriptionProgressFill.style.width = '0%';
+    transcriptionProgressText.textContent = '0%';
+  }
   exportProgress.classList.toggle('hidden', state !== State.EXPORTING);
 
   transcribeBtn.disabled = state !== State.IDLE && state !== State.EDITING;
@@ -98,29 +121,47 @@ function getWorker() {
   worker.addEventListener('error', (event) => {
     console.error('Whisper worker error:', event);
     setState(State.IDLE);
-    alert('Worker failed: ' + (event.message || 'unknown error'));
+    alert(t('error.worker') + (event.message || 'unknown error'));
   });
   return worker;
 }
 
 const fileProgress = {};
+let modelLoadTimer = null;
 
 function handleWorkerMessage(event) {
   const msg = event.data;
 
   if (msg.type === 'download-progress') {
-    setState(State.DOWNLOADING_MODEL);
     fileProgress[msg.file] = { loaded: msg.loaded, total: msg.total };
     const totalLoaded = Object.values(fileProgress).reduce((sum, f) => sum + f.loaded, 0);
     const totalSize = Object.values(fileProgress).reduce((sum, f) => sum + f.total, 0);
     const percent = totalSize > 0 ? Math.round((totalLoaded / totalSize) * 100) : 0;
     modelProgressFill.style.width = percent + '%';
     modelProgressText.textContent = percent + '%';
+    // Only show loading UI if it takes more than 300ms (skip for cached models)
+    if (!modelLoadTimer && currentState !== State.DOWNLOADING_MODEL) {
+      modelLoadTimer = setTimeout(() => setState(State.DOWNLOADING_MODEL), 300);
+    }
     return;
   }
 
   if (msg.type === 'model-ready') {
+    clearTimeout(modelLoadTimer);
+    modelLoadTimer = null;
+    Object.keys(fileProgress).forEach(k => delete fileProgress[k]);
     setState(State.TRANSCRIBING);
+    return;
+  }
+
+  if (msg.type === 'transcribe-progress') {
+    const percent = Math.round(msg.progress * 100);
+    transcriptionProgressFill.style.width = percent + '%';
+    transcriptionProgressText.textContent = percent + '%';
+    if (msg.segments?.length) {
+      editor.setSegments(msg.segments);
+      updateSubtitlePreview(msg.segments);
+    }
     return;
   }
 
@@ -134,7 +175,7 @@ function handleWorkerMessage(event) {
   if (msg.type === 'error') {
     console.error('Whisper worker error:', msg.message || msg);
     setState(State.IDLE);
-    alert('Transcription failed: ' + (msg.message || 'unknown error - check console'));
+    alert(t('error.transcribe') + (msg.message || 'unknown error'));
   }
 }
 
@@ -144,7 +185,7 @@ transcribeBtn.addEventListener('click', async () => {
   if (!videoFile) return;
 
   transcribeBtn.disabled = true;
-  transcribeBtn.textContent = 'Extracting audio...';
+  transcribeBtn.textContent = t('btn.extracting');
 
   try {
     console.log('[app] initializing ffmpeg...');
@@ -154,15 +195,15 @@ transcribeBtn.addEventListener('click', async () => {
     console.log('[app] audio extracted, samples:', audioData.length);
 
     setState(State.DOWNLOADING_MODEL);
-    transcribeBtn.textContent = 'Transcribe';
+    transcribeBtn.textContent = t('btn.transcribe');
 
     const w = getWorker();
-    w.postMessage({ type: 'transcribe', audio: audioData });
+    w.postMessage({ type: 'transcribe', audio: audioData, language: whisperLang.value });
   } catch (err) {
     console.error('Transcription pipeline error:', err);
-    transcribeBtn.textContent = 'Transcribe';
+    transcribeBtn.textContent = t('btn.transcribe');
     setState(State.IDLE);
-    alert('Failed to process video: ' + err.message);
+    alert(t('error.process') + err.message);
   }
 });
 
@@ -177,6 +218,7 @@ editorContainer.addEventListener('input', refreshPreview);
 editorContainer.addEventListener('click', (event) => {
   if (event.target.classList.contains('segment-delete') ||
       event.target.classList.contains('offset-btn') ||
+      event.target.classList.contains('segment-gap-insert') ||
       event.target.classList.contains('add-segment-btn')) {
     setTimeout(refreshPreview, 50);
   }
@@ -211,7 +253,7 @@ exportBtn.addEventListener('click', async () => {
   } catch (err) {
     console.error('Export error:', err);
     setState(State.EDITING);
-    alert('Export failed: ' + err.message);
+    alert(t('error.export') + err.message);
   }
 });
 
@@ -253,7 +295,7 @@ function updateSubtitlePreview(segments) {
   const track = document.createElement('track');
   track.kind = 'subtitles';
   track.label = 'Subtitles';
-  track.srclang = 'zh';
+  track.srclang = whisperLang.value || 'en';
   track.src = trackBlobUrl;
   track.default = true;
   videoPreview.appendChild(track);

@@ -172,7 +172,30 @@ main {
 
 .actions {
   display: flex;
+  align-items: center;
   gap: 12px;
+}
+
+.lang-select {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: auto;
+}
+
+.lang-select label {
+  font-size: 0.85em;
+  color: var(--text-secondary);
+}
+
+.lang-select select {
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 0.85em;
+  font-family: inherit;
 }
 
 button {
