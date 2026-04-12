@@ -58,9 +58,7 @@
   background: var(--surface);
 }
 
-.segment-list:empty::after {
-  content: 'No segments yet';
-  display: block;
+.segment-list-empty {
   padding: 24px;
   text-align: center;
   color: var(--text-secondary);
@@ -141,6 +139,25 @@
 .segment-text:focus {
   outline: 2px solid var(--primary);
   border-color: var(--primary);
+}
+
+.segment-gap-insert {
+  display: block;
+  width: 100%;
+  padding: 4px 0;
+  border: none;
+  background: transparent;
+  color: transparent;
+  font-size: 0.75em;
+  cursor: pointer;
+  transition: padding 0.15s, color 0.15s, background-color 0.15s;
+}
+
+.segment-gap-insert:hover,
+.segment-gap-insert:focus-visible {
+  padding: 8px 0;
+  color: var(--primary);
+  background: rgba(96, 125, 139, 0.06);
 }
 
 .segment-delete {

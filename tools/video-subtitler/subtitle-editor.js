@@ -23,8 +23,9 @@ function formatTime(totalSeconds) {
 }
 
 export default class SubtitleEditor {
-  constructor(container) {
+  constructor(container, t) {
     this.container = container;
+    this.t = t;
     this.segments = [];
     this.clickCallback = null;
     this.offsetValue = 0;
@@ -67,12 +68,11 @@ export default class SubtitleEditor {
   // -- Private --
 
   _renderShell() {
-    // Offset controls
     const header = document.createElement('div');
     header.className = 'subtitle-editor-header';
     header.innerHTML = `
-      <span class="offset-label">Time Offset</span>
-      <button type="button" class="offset-btn offset-minus" title="−100ms">−</button>
+      <span class="offset-label">${this.t('editor.offset')}</span>
+      <button type="button" class="offset-btn offset-minus" title="\u2212100ms">\u2212</button>
       <span class="offset-display">+0.0s</span>
       <button type="button" class="offset-btn offset-plus" title="+100ms">+</button>
     `;
@@ -82,25 +82,49 @@ export default class SubtitleEditor {
 
     this.offsetDisplay = header.querySelector('.offset-display');
 
-    // Segment list
     this.segmentList = document.createElement('div');
     this.segmentList.className = 'segment-list';
 
-    // Add button
+    this.emptyPlaceholder = document.createElement('div');
+    this.emptyPlaceholder.className = 'segment-list-empty';
+    this.emptyPlaceholder.textContent = this.t('editor.empty');
+    this.segmentList.appendChild(this.emptyPlaceholder);
+
     const addBtn = document.createElement('button');
     addBtn.type = 'button';
     addBtn.className = 'add-segment-btn';
-    addBtn.textContent = '+ Add Segment';
-    addBtn.addEventListener('click', () => this._addSegment());
+    addBtn.textContent = this.t('editor.add');
+    addBtn.addEventListener('click', () => this._insertAt(this.segments.length));
 
     this.container.append(header, this.segmentList, addBtn);
   }
 
   _renderSegments() {
     this.segmentList.innerHTML = '';
+
+    if (this.segments.length === 0) {
+      this.segmentList.appendChild(this.emptyPlaceholder);
+      return;
+    }
+
+    // Gap button before first row
+    this.segmentList.appendChild(this._createGapButton(0));
+
     this.segments.forEach((seg, idx) => {
       this.segmentList.appendChild(this._createSegmentRow(seg, idx));
+      // Gap button after each row
+      this.segmentList.appendChild(this._createGapButton(idx + 1));
     });
+  }
+
+  _createGapButton(insertIndex) {
+    const gap = document.createElement('button');
+    gap.type = 'button';
+    gap.className = 'segment-gap-insert';
+    gap.textContent = '+';
+    gap.title = this.t('editor.insert');
+    gap.addEventListener('click', () => this._insertAt(insertIndex));
+    return gap;
   }
 
   _createSegmentRow(segment, index) {
@@ -140,7 +164,7 @@ export default class SubtitleEditor {
     deleteBtn.type = 'button';
     deleteBtn.className = 'segment-delete';
     deleteBtn.textContent = '\u00d7';
-    deleteBtn.title = 'Delete segment';
+    deleteBtn.title = this.t('editor.delete');
     deleteBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       this._deleteSegment(index);
@@ -172,25 +196,27 @@ export default class SubtitleEditor {
     });
   }
 
+  _insertAt(index) {
+    const current = this.getSegments();
+    const before = index > 0 ? current[index - 1] : null;
+    const after = index < current.length ? current[index] : null;
+    const start = before ? before.end : 0;
+    const end = after ? after.start : start;
+    current.splice(index, 0, { text: '', start, end });
+    this.segments = current;
+    this._renderSegments();
+
+    const rows = this.segmentList.querySelectorAll('.segment-row');
+    const newRow = rows[index];
+    if (newRow) {
+      newRow.querySelector('.segment-text').focus();
+    }
+  }
+
   _deleteSegment(index) {
     this.segments = this.getSegments();
     this.segments.splice(index, 1);
     this._renderSegments();
-  }
-
-  _addSegment() {
-    const current = this.getSegments();
-    const lastEnd = current.length > 0 ? current[current.length - 1].end : 0;
-    current.push({ text: '', start: lastEnd, end: lastEnd });
-    this.segments = current;
-    this._renderSegments();
-
-    // Focus the new textarea
-    const rows = this.segmentList.querySelectorAll('.segment-row');
-    const lastRow = rows[rows.length - 1];
-    if (lastRow) {
-      lastRow.querySelector('.segment-text').focus();
-    }
   }
 
   _applyOffset(delta) {
