@@ -19,6 +19,8 @@ const locales = {
     'error.export': 'Export failed: ',
     'error.process': 'Failed to process video: ',
     'lang.label': 'Language',
+    'device.webgpu': 'Using GPU acceleration (WebGPU)',
+    'device.wasm': 'WebGPU not available, using CPU (slower)',
   },
   'zh-TW': {
     'title': '影片字幕產生器',
@@ -40,6 +42,8 @@ const locales = {
     'error.export': '匯出失敗：',
     'error.process': '影片處理失敗：',
     'lang.label': '語言',
+    'device.webgpu': '使用 GPU 加速 (WebGPU)',
+    'device.wasm': 'WebGPU 不可用，使用 CPU（較慢）',
   },
 };
 

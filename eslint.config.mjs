@@ -120,6 +120,7 @@ export default [
         self: 'readonly',
         console: 'readonly',
         performance: 'readonly',
+        navigator: 'readonly',
       },
     },
     rules: {

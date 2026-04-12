@@ -1,25 +1,14 @@
 /**
  * Web Worker for Whisper speech recognition via transformers.js.
  * Accepts Float32Array audio (16kHz mono) and returns timestamped segments.
- *
- * Uses Breeze-ASR-25 (fine-tuned for Traditional Chinese) when language is 'zh',
- * and whisper-large-v3-turbo for all other languages.
  */
 
-const MODELS = {
-  zh: {
-    id: 'a2d8a4v/Breeze-ASR-25-ONNX',
-    dtype: 'q4f16',
-  },
-  default: {
-    id: 'onnx-community/whisper-large-v3-turbo',
-    dtype: 'q4',
-  },
-};
+const MODEL_ID = 'onnx-community/whisper-large-v3-turbo';
+const MODEL_DTYPE = 'q4';
 
 let createPipeline = null;
-const pipelines = {}; // keyed by model id
-const loadingPromises = {};
+let pipe = null;
+let pipePromise = null;
 
 function handleProgressEvent(event) {
   if (event.status === 'progress') {
@@ -33,44 +22,60 @@ function handleProgressEvent(event) {
   }
 }
 
+let detectedDevice = null;
+
 async function ensureTransformers() {
   if (createPipeline) return;
   const mod = await import(
     'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3'
   );
   createPipeline = mod.pipeline;
+
+  // Detect WebGPU support
+  if (typeof navigator !== 'undefined' && navigator.gpu) {
+    try {
+      const adapter = await navigator.gpu.requestAdapter();
+      if (adapter) {
+        detectedDevice = 'webgpu';
+        console.log('[whisper] WebGPU available, using GPU acceleration');
+      }
+    } catch {
+      // WebGPU request failed, fall back
+    }
+  }
+  if (!detectedDevice) {
+    detectedDevice = 'wasm';
+    console.log('[whisper] WebGPU not available, falling back to WASM (CPU)');
+  }
+  self.postMessage({ type: 'device-info', device: detectedDevice });
 }
 
-async function ensureModel(language) {
-  const modelKey = language === 'zh' ? 'zh' : 'default';
-  const model = MODELS[modelKey];
+async function ensureModel() {
+  if (pipe) return pipe;
+  if (pipePromise) return pipePromise;
 
-  if (pipelines[model.id]) return pipelines[model.id];
-  if (loadingPromises[model.id]) return loadingPromises[model.id];
-
-  loadingPromises[model.id] = (async () => {
+  pipePromise = (async () => {
     await ensureTransformers();
 
-    const pipe = await createPipeline(
+    pipe = await createPipeline(
       'automatic-speech-recognition',
-      model.id,
+      MODEL_ID,
       {
-        dtype: model.dtype,
-        device: 'wasm',
+        dtype: MODEL_DTYPE,
+        device: detectedDevice,
         progress_callback: handleProgressEvent,
       },
     );
 
-    pipelines[model.id] = pipe;
     self.postMessage({ type: 'model-ready' });
     return pipe;
   })();
 
-  return loadingPromises[model.id];
+  return pipePromise;
 }
 
 async function transcribe(audio, language) {
-  const pipe = await ensureModel(language);
+  await ensureModel();
 
   const SAMPLE_RATE = 16000;
   const CHUNK_SEC = 10;
@@ -157,7 +162,7 @@ self.addEventListener('message', async (event) => {
 
   try {
     if (type === 'load') {
-      await ensureModel(language);
+      await ensureModel();
     } else if (type === 'transcribe') {
       await transcribe(audio, language);
     }

@@ -198,6 +198,19 @@ main {
   font-family: inherit;
 }
 
+.device-notice {
+  font-size: 0.8em;
+  color: var(--text-secondary);
+}
+
+.device-notice:empty {
+  display: none;
+}
+
+.device-notice.device-warn {
+  color: #c67b28;
+}
+
 button {
   padding: 10px 24px;
   border: none;

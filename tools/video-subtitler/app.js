@@ -132,6 +132,15 @@ let modelLoadTimer = null;
 function handleWorkerMessage(event) {
   const msg = event.data;
 
+  if (msg.type === 'device-info') {
+    const notice = document.getElementById('device-notice');
+    if (notice) {
+      notice.textContent = t('device.' + msg.device);
+      notice.className = 'device-notice' + (msg.device === 'wasm' ? ' device-warn' : '');
+    }
+    return;
+  }
+
   if (msg.type === 'download-progress') {
     fileProgress[msg.file] = { loaded: msg.loaded, total: msg.total };
     const totalLoaded = Object.values(fileProgress).reduce((sum, f) => sum + f.loaded, 0);
