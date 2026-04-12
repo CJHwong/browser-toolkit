@@ -13,6 +13,7 @@ export default [
       'tools/markslide-studio/src/utils/*.js',
       'tools/video-subtitler/app.js',
       'tools/video-subtitler/ffmpeg-utils.js',
+      'tools/video-subtitler/i18n.js',
       'tools/video-subtitler/subtitle-editor.js',
     ],
     languageOptions: {
@@ -35,6 +36,8 @@ export default [
         FFmpegWASM: 'readonly',
         FFmpegUtil: 'readonly',
         setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        navigator: 'readonly',
         fetch: 'readonly',
       },
     },
@@ -116,6 +119,7 @@ export default [
       globals: {
         self: 'readonly',
         console: 'readonly',
+        performance: 'readonly',
       },
     },
     rules: {
@@ -158,6 +162,7 @@ export default [
       'tools/markslide-studio/src/utils/*.js',
       'tools/video-subtitler/app.js',
       'tools/video-subtitler/ffmpeg-utils.js',
+      'tools/video-subtitler/i18n.js',
       'tools/video-subtitler/subtitle-editor.js',
       'tools/video-subtitler/whisper-worker.js',
       'tools/video-subtitler/coi-serviceworker.js',
