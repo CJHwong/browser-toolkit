@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Video + SRT Player — Browser Toolkit</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+      :root {
+        --background: #f5f4ed;
+        --surface: #fcfbf7;
+        --border: #e4e2da;
+        --text-primary: #383631;
+        --text-secondary: #7a7874;
+        --primary: #607d8b;
+        --primary-hover: #546e7a;
+      }
+
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+          Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: var(--background);
+        color: var(--text-primary);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        padding: 2rem 1rem;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .container {
+        width: min(900px, 100%);
+      }
+
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: 0.85rem;
+        margin-bottom: 1.5rem;
+        transition: color .15s;
+      }
+      .back-link:hover { color: var(--primary); }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 24px;
+      }
+
+      h1 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+      .subtitle {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        margin-bottom: 20px;
+      }
+
+      #video-title {
+        font-size: 1rem;
+        font-weight: 500;
+        margin-bottom: 12px;
+        min-height: 1.4em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: var(--text-primary);
+      }
+
+      .upload-bar {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+      }
+      .upload-bar label {
+        flex: 1;
+        min-width: 140px;
+        max-width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 10px 16px;
+        border-radius: 8px;
+        background: var(--background);
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 500;
+        border: 1px solid var(--border);
+        transition: all .15s;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .upload-bar label:hover {
+        border-color: var(--primary);
+        background: #edece4;
+      }
+      .upload-bar label.loaded {
+        border-color: #6b9955;
+        background: #eaf3e4;
+      }
+      .upload-bar input { display: none; }
+
+      .video-wrapper {
+        position: relative;
+        background: #000;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      video {
+        display: block;
+        width: 100%;
+        max-height: 70vh;
+        object-fit: contain;
+      }
+      .subs-overlay {
+        position: absolute;
+        bottom: 56px;
+        left: 0;
+        right: 0;
+        pointer-events: none;
+        text-align: center;
+        padding: 0 16px;
+      }
+      .subs-text {
+        display: inline-block;
+        background: rgba(0,0,0,.78);
+        color: #fff;
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-size: clamp(1rem, 4vw, 1.4rem);
+        line-height: 1.5;
+        max-width: 90%;
+      }
+
+      .controls-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 12px;
+        flex-wrap: wrap;
+      }
+      .controls-row .label {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        margin-right: 2px;
+      }
+
+      .skip-btn, .speed-btn {
+        background: var(--background);
+        border: 1px solid var(--border);
+        color: var(--text-primary);
+        padding: 5px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.8rem;
+        font-weight: 500;
+        font-family: inherit;
+        transition: all .15s;
+      }
+      .skip-btn:hover, .speed-btn:hover {
+        border-color: var(--primary);
+        background: #edece4;
+      }
+      .speed-btn.active {
+        border-color: var(--primary);
+        background: #dce4e8;
+        color: var(--primary-hover);
+        font-weight: 600;
+      }
+
+      #speed-slider {
+        flex: 1;
+        min-width: 80px;
+        max-width: 160px;
+        accent-color: var(--primary);
+      }
+      #speed-display {
+        font-size: 0.85rem;
+        min-width: 3.2em;
+        font-variant-numeric: tabular-nums;
+        color: var(--text-secondary);
+      }
+
+      .divider {
+        color: var(--border);
+        user-select: none;
+      }
+
+      .status-line {
+        margin-top: 10px;
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        min-height: 1.2em;
+      }
+      .status-line.error { color: #c0392b; }
+
+      @media (max-width: 600px) {
+        .card { padding: 16px; }
+        .controls-row { gap: 6px; }
+        .skip-btn, .speed-btn { padding: 4px 8px; font-size: 0.75rem; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <a class="back-link" href="../../index.html">← Back to Toolkit</a>
+      <div class="card">
+        <h1>Video + SRT Player</h1>
+        <p class="subtitle">Upload a video and its subtitle file, play with synced captions.</p>
+
+        <div class="upload-bar">
+          <label id="video-label">
+            <input type="file" id="video-input" accept="video/*" />
+            🎬 Select Video
+          </label>
+          <label id="srt-label">
+            <input type="file" id="srt-input" accept=".srt,.txt,.vtt" />
+            📄 Select SRT
+          </label>
+        </div>
+
+        <h2 id="video-title"></h2>
+
+        <div class="video-wrapper">
+          <video id="player" controls></video>
+          <div class="subs-overlay">
+            <div id="subs" class="subs-text"></div>
+          </div>
+        </div>
+
+        <div class="controls-row">
+          <button class="skip-btn" id="skip-back">−10s</button>
+          <button class="skip-btn" id="skip-fwd">+10s</button>
+          <span class="divider">|</span>
+          <span class="label">Speed</span>
+          <button class="speed-btn" data-speed="0.5">0.5×</button>
+          <button class="speed-btn active" data-speed="1">1×</button>
+          <button class="speed-btn" data-speed="1.5">1.5×</button>
+          <button class="speed-btn" data-speed="2">2×</button>
+          <button class="speed-btn" data-speed="3">3×</button>
+          <button class="speed-btn" data-speed="4">4×</button>
+          <button class="speed-btn" data-speed="6">6×</button>
+          <button class="speed-btn" data-speed="8">8×</button>
+          <input type="range" id="speed-slider" min="0.25" max="8" step="0.25" value="1" />
+          <span id="speed-display">1.00×</span>
+        </div>
+
+        <div id="status" class="status-line">
+          Upload a video and an SRT file to get started.
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const video = document.getElementById('player');
+        const subsEl = document.getElementById('subs');
+        const statusEl = document.getElementById('status');
+        const videoTitle = document.getElementById('video-title');
+        const videoLabel = document.getElementById('video-label');
+        const srtLabel = document.getElementById('srt-label');
+        const videoInput = document.getElementById('video-input');
+        const srtInput = document.getElementById('srt-input');
+
+        let cues = [];
+
+        function parseSRT(text) {
+          const blocks = text.trim().replace(/\r\n/g, '\n').split(/\n\n+/);
+          const parsed = [];
+          for (const block of blocks) {
+            const lines = block.split('\n');
+            if (lines.length < 2) continue;
+            const timeLine = lines.find(l => l.includes('-->'));
+            if (!timeLine) continue;
+            const parts = timeLine.split('-->');
+            if (parts.length < 2) continue;
+            const start = tsToSec(parts[0].trim());
+            const end = tsToSec(parts[1].trim());
+            const textIdx = lines.indexOf(timeLine) + 1;
+            const text = lines.slice(textIdx).filter(l => !/^\d+$/.test(l)).join('\n');
+            if (!isNaN(start) && !isNaN(end) && text) {
+              parsed.push({ start, end, text });
+            }
+          }
+          parsed.sort((a, b) => a.start - b.start);
+          return parsed;
+        }
+
+        function tsToSec(ts) {
+          const parts = ts.replace(',', '.').split(':');
+          if (parts.length === 3) return +parts[0] * 3600 + +parts[1] * 60 + +parts[2];
+          if (parts.length === 2) return +parts[0] * 60 + +parts[1];
+          return +parts[0];
+        }
+
+        function updateSubtitle() {
+          const t = video.currentTime;
+          let text = '';
+          for (const cue of cues) {
+            if (t >= cue.start && t < cue.end) { text = cue.text; break; }
+            if (cue.start > t) break;
+          }
+          subsEl.textContent = text;
+        }
+
+        function loadSRT(file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            cues = parseSRT(e.target.result);
+            if (cues.length === 0) {
+              statusEl.textContent = 'No valid cues found in the SRT file.';
+              statusEl.className = 'status-line error';
+              return;
+            }
+            statusEl.textContent = `Loaded ${cues.length} subtitle cues.`;
+            statusEl.className = 'status-line';
+            srtLabel.classList.add('loaded');
+            if (video.paused) updateSubtitle();
+          };
+          reader.onerror = function () {
+            statusEl.textContent = 'Failed to read SRT file.';
+            statusEl.className = 'status-line error';
+          };
+          reader.readAsText(file);
+        }
+
+        videoInput.addEventListener('change', function () {
+          const file = this.files[0];
+          if (!file) return;
+          const url = URL.createObjectURL(file);
+          video.src = url;
+          videoTitle.textContent = file.name.replace(/\.[^.]+$/, '');
+          videoLabel.classList.add('loaded');
+          statusEl.textContent = 'Video loaded. Waiting for SRT…';
+          statusEl.className = 'status-line';
+          subsEl.textContent = '';
+        });
+
+        srtInput.addEventListener('change', function () {
+          const file = this.files[0];
+          if (!file) return;
+          loadSRT(file);
+        });
+
+        // --- Speed controls ---
+        const speedBtns = document.querySelectorAll('.speed-btn');
+        const speedSlider = document.getElementById('speed-slider');
+        const speedDisplay = document.getElementById('speed-display');
+
+        function setSpeed(speed) {
+          video.playbackRate = speed;
+          speedSlider.value = speed;
+          speedDisplay.textContent = speed.toFixed(2) + '×';
+          speedBtns.forEach(b => b.classList.toggle('active', +b.dataset.speed === speed));
+        }
+
+        speedBtns.forEach(btn => {
+          btn.addEventListener('click', () => setSpeed(+btn.dataset.speed));
+        });
+
+        speedSlider.addEventListener('input', () => {
+          const speed = +speedSlider.value;
+          video.playbackRate = speed;
+          speedDisplay.textContent = speed.toFixed(2) + '×';
+          speedBtns.forEach(b => b.classList.toggle('active', +b.dataset.speed === speed));
+        });
+
+        // --- Skip buttons ---
+        document.getElementById('skip-back').addEventListener('click', () => {
+          video.currentTime = Math.max(0, video.currentTime - 10);
+        });
+        document.getElementById('skip-fwd').addEventListener('click', () => {
+          video.currentTime = Math.min(video.duration || Infinity, video.currentTime + 10);
+        });
+
+        video.addEventListener('timeupdate', updateSubtitle);
+        video.addEventListener('seeking', updateSubtitle);
+      })();
+    </script>
+  </body>
+</html>
