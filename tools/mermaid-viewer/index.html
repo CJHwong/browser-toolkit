@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mermaid Viewer — Browser Toolkit</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+      :root {
+        --background: #f5f4ed;
+        --surface: #fcfbf7;
+        --border: #e4e2da;
+        --text-primary: #383631;
+        --text-secondary: #7a7874;
+        --primary: #607d8b;
+        --primary-hover: #546e7a;
+        --danger: #b3554d;
+      }
+
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+          Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: var(--background);
+        color: var(--text-primary);
+        min-height: 100vh;
+        padding: 2rem 1rem;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .container {
+        width: 100%;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        min-height: calc(100vh - 4rem);
+      }
+
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: 0.85rem;
+        margin-bottom: 1.5rem;
+        transition: color 0.15s;
+      }
+      .back-link:hover { color: var(--primary); }
+
+      h1 { font-size: 1.25rem; font-weight: 600; margin-bottom: 4px; }
+      .subtitle {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        margin-bottom: 20px;
+      }
+
+      .workspace {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        min-height: 480px;
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Source sits on top at its own height; preview takes the rest. */
+      .source-card { flex: 0 0 auto; }
+      .preview-card { flex: 1 1 auto; min-height: 0; }
+
+      .card-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      .card-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--text-secondary);
+      }
+
+      .ghost {
+        padding: 4px 8px;
+        font-size: 0.72rem;
+        color: var(--text-secondary);
+      }
+
+      textarea {
+        width: 100%;
+        height: 150px;
+        min-height: 44px;
+        resize: vertical;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px;
+        font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+        font-size: 0.85rem;
+        line-height: 1.5;
+        color: var(--text-primary);
+        background: #fff;
+        tab-size: 2;
+      }
+      textarea:focus { outline: none; border-color: var(--primary); }
+
+      /* Collapsed: hide the editor, keep just the header bar. */
+      .source-card.collapsed textarea { display: none; }
+      .source-card.collapsed .card-head { margin-bottom: 0; }
+
+      .preview-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+      }
+
+      .toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+      button, select {
+        font-family: inherit;
+        font-size: 0.8rem;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 6px 12px;
+        background: #fff;
+        color: var(--text-primary);
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      button:hover, select:hover { border-color: var(--primary); }
+      button.primary {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: #fff;
+      }
+      button.primary:hover { background: var(--primary-hover); }
+      button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+      .preview {
+        flex: 1;
+        position: relative;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #fff;
+        overflow: hidden;
+        cursor: grab;
+        touch-action: none;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+      .preview.panning { cursor: grabbing; }
+      .preview:fullscreen { background: #fff; }
+
+      #stage {
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform-origin: 0 0;
+        will-change: transform;
+        transition: transform 0.12s ease-out;
+      }
+      /* No transition while dragging or wheel-zooming, so motion tracks input. */
+      .preview.panning #stage,
+      #stage.no-anim { transition: none; }
+      #stage svg { display: block; }
+
+      #message {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        pointer-events: none;
+      }
+      #message:empty { display: none; }
+
+      .error {
+        color: var(--danger);
+        font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+        font-size: 0.8rem;
+        white-space: pre-wrap;
+        text-align: left;
+      }
+
+      .hint { font-size: 0.7rem; color: var(--text-secondary); }
+
+      .zoom-group {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .zoom-group button {
+        padding: 6px 10px;
+        min-width: 32px;
+      }
+      #zoom-level {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        min-width: 42px;
+        text-align: center;
+        font-variant-numeric: tabular-nums;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <a href="../" class="back-link">← All tools</a>
+      <h1>Mermaid Viewer</h1>
+      <p class="subtitle">
+        Edit Mermaid syntax, preview live, view fullscreen, and export
+        high-resolution PNG. Always runs the latest Mermaid.
+      </p>
+
+      <div class="workspace">
+        <div class="card source-card" id="source-card">
+          <div class="card-head">
+            <span class="card-label">Source</span>
+            <button id="toggle-source" class="ghost" title="Collapse editor">
+              Collapse ▲
+            </button>
+          </div>
+          <textarea id="source" spellcheck="false"></textarea>
+        </div>
+
+        <div class="card preview-card">
+          <div class="preview-head">
+            <span class="card-label" style="margin: 0">Preview</span>
+            <div class="toolbar">
+              <div class="zoom-group">
+                <button id="zoom-out" title="Zoom out">−</button>
+                <span id="zoom-level">100%</span>
+                <button id="zoom-in" title="Zoom in">+</button>
+                <button id="zoom-fit" title="Fit to view">Fit</button>
+              </div>
+              <select id="scale" title="PNG export resolution">
+                <option value="2">2× PNG</option>
+                <option value="3" selected>3× PNG</option>
+                <option value="4">4× PNG</option>
+                <option value="6">6× PNG</option>
+              </select>
+              <button id="download" class="primary">Download PNG</button>
+              <button id="fullscreen">Fullscreen</button>
+            </div>
+          </div>
+          <div class="preview" id="preview">
+            <div id="stage"></div>
+            <div id="message"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+
+      mermaid.initialize({ startOnLoad: false, securityLevel: 'loose' });
+
+      const source = document.getElementById('source');
+      const preview = document.getElementById('preview');
+      const stage = document.getElementById('stage');
+      const message = document.getElementById('message');
+      const downloadBtn = document.getElementById('download');
+      const fullscreenBtn = document.getElementById('fullscreen');
+      const scaleSelect = document.getElementById('scale');
+      const zoomLevel = document.getElementById('zoom-level');
+
+      const STORAGE_KEY = 'mermaid-viewer:source';
+      const COLLAPSE_KEY = 'mermaid-viewer:collapsed';
+      const DEFAULT_DIAGRAM = `graph TD
+  A[Start] --> B{Is it working?}
+  B -->|Yes| C[Ship it]
+  B -->|No| D[Debug]
+  D --> B`;
+
+      let renderId = 0;
+      let lastValidSvg = null;
+
+      // Pan/zoom transform state for the stage.
+      const view = { scale: 1, tx: 0, ty: 0 };
+      const MIN_SCALE = 0.1;
+      const MAX_SCALE = 10;
+
+      function applyTransform() {
+        stage.style.transform =
+          `translate(${view.tx}px, ${view.ty}px) scale(${view.scale})`;
+        zoomLevel.textContent = `${Math.round(view.scale * 100)}%`;
+      }
+
+      // Fit the rendered SVG inside the viewport and center it.
+      function fitToView() {
+        if (!lastValidSvg) return;
+        stage.classList.remove('no-anim');
+        const { width, height } = svgDimensions(lastValidSvg);
+        const vw = preview.clientWidth;
+        const vh = preview.clientHeight;
+        if (!width || !height || !vw || !vh) return;
+        const fit = Math.min(vw / width, vh / height) * 0.95;
+        view.scale = Math.min(fit, 1);
+        view.tx = (vw - width * view.scale) / 2;
+        view.ty = (vh - height * view.scale) / 2;
+        applyTransform();
+      }
+
+      async function render() {
+        const code = source.value.trim();
+        if (!code) {
+          stage.innerHTML = '';
+          message.innerHTML = '<span class="hint">Type some Mermaid above.</span>';
+          lastValidSvg = null;
+          downloadBtn.disabled = true;
+          return;
+        }
+        try {
+          const { svg } = await mermaid.render(`m${++renderId}`, code);
+          message.innerHTML = '';
+          stage.innerHTML = svg;
+          lastValidSvg = stage.querySelector('svg');
+          if (lastValidSvg) {
+            const { width, height } = svgDimensions(lastValidSvg);
+            lastValidSvg.style.maxWidth = 'none';
+            lastValidSvg.setAttribute('width', width);
+            lastValidSvg.setAttribute('height', height);
+          }
+          downloadBtn.disabled = false;
+          localStorage.setItem(STORAGE_KEY, code);
+          fitToView();
+        } catch (err) {
+          stage.innerHTML = '';
+          message.innerHTML = `<div class="error">${escapeHtml(
+            err?.message || String(err)
+          )}</div>`;
+          downloadBtn.disabled = true;
+        }
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      // Resolve the SVG's pixel dimensions from viewBox or attributes.
+      function svgDimensions(svg) {
+        const viewBox = svg.viewBox?.baseVal;
+        if (viewBox && viewBox.width && viewBox.height) {
+          return { width: viewBox.width, height: viewBox.height };
+        }
+        const rect = svg.getBoundingClientRect();
+        return { width: rect.width, height: rect.height };
+      }
+
+      async function downloadPng() {
+        if (!lastValidSvg) return;
+        const scale = Number(scaleSelect.value);
+        const { width, height } = svgDimensions(lastValidSvg);
+
+        const clone = lastValidSvg.cloneNode(true);
+        clone.setAttribute('width', width);
+        clone.setAttribute('height', height);
+        clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+        const svgString = new XMLSerializer().serializeToString(clone);
+        const svgUrl =
+          'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgString);
+
+        const img = new Image();
+        img.decoding = 'sync';
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = () => reject(new Error('Failed to rasterize SVG'));
+          img.src = svgUrl;
+        });
+
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(width * scale);
+        canvas.height = Math.round(height * scale);
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob(blob => {
+          const link = document.createElement('a');
+          link.download = 'diagram.png';
+          link.href = URL.createObjectURL(blob);
+          link.click();
+          URL.revokeObjectURL(link.href);
+        }, 'image/png');
+      }
+
+      function toggleFullscreen() {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          preview.requestFullscreen();
+        }
+      }
+
+      // Zoom toward a point (px,py) in viewport coords, keeping it fixed.
+      function zoomAt(factor, px, py) {
+        const next = Math.min(MAX_SCALE, Math.max(MIN_SCALE, view.scale * factor));
+        if (next === view.scale) return;
+        const contentX = (px - view.tx) / view.scale;
+        const contentY = (py - view.ty) / view.scale;
+        view.scale = next;
+        view.tx = px - contentX * next;
+        view.ty = py - contentY * next;
+        applyTransform();
+      }
+
+      function zoomCenter(factor) {
+        stage.classList.remove('no-anim');
+        zoomAt(factor, preview.clientWidth / 2, preview.clientHeight / 2);
+      }
+
+      // Exponential factor → zoom step scales with scroll speed, so trackpad
+      // and mouse wheel both feel smooth and proportional.
+      preview.addEventListener('wheel', e => {
+        e.preventDefault();
+        stage.classList.add('no-anim');
+        const rect = preview.getBoundingClientRect();
+        const factor = Math.exp(-e.deltaY * 0.0015);
+        zoomAt(factor, e.clientX - rect.left, e.clientY - rect.top);
+      }, { passive: false });
+
+      // Drag to pan via pointer events (mouse + touch).
+      let dragging = false;
+      let startX = 0;
+      let startY = 0;
+      preview.addEventListener('pointerdown', e => {
+        if (!lastValidSvg) return;
+        dragging = true;
+        startX = e.clientX - view.tx;
+        startY = e.clientY - view.ty;
+        preview.classList.add('panning');
+        preview.setPointerCapture(e.pointerId);
+      });
+      preview.addEventListener('pointermove', e => {
+        if (!dragging) return;
+        view.tx = e.clientX - startX;
+        view.ty = e.clientY - startY;
+        applyTransform();
+      });
+      function endDrag(e) {
+        if (!dragging) return;
+        dragging = false;
+        preview.classList.remove('panning');
+        preview.releasePointerCapture(e.pointerId);
+      }
+      preview.addEventListener('pointerup', endDrag);
+      preview.addEventListener('pointercancel', endDrag);
+      preview.addEventListener('dblclick', fitToView);
+
+      document.getElementById('zoom-in').addEventListener('click', () =>
+        zoomCenter(1.2)
+      );
+      document.getElementById('zoom-out').addEventListener('click', () =>
+        zoomCenter(1 / 1.2)
+      );
+      document.getElementById('zoom-fit').addEventListener('click', fitToView);
+
+      // Collapse / expand the source editor to give the preview the full area.
+      const sourceCard = document.getElementById('source-card');
+      const toggleSource = document.getElementById('toggle-source');
+      function setCollapsed(collapsed) {
+        sourceCard.classList.toggle('collapsed', collapsed);
+        toggleSource.textContent = collapsed ? 'Expand ▼' : 'Collapse ▲';
+        localStorage.setItem(COLLAPSE_KEY, collapsed ? '1' : '0');
+        fitToView();
+      }
+      toggleSource.addEventListener('click', () =>
+        setCollapsed(!sourceCard.classList.contains('collapsed'))
+      );
+
+      // Re-fit when the viewport resizes (preview is the flexible area).
+      window.addEventListener('resize', fitToView);
+
+      let debounce;
+      source.addEventListener('input', () => {
+        clearTimeout(debounce);
+        debounce = setTimeout(render, 300);
+      });
+      downloadBtn.addEventListener('click', downloadPng);
+      fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+      source.value = localStorage.getItem(STORAGE_KEY) || DEFAULT_DIAGRAM;
+      if (localStorage.getItem(COLLAPSE_KEY) === '1') setCollapsed(true);
+      render();
+    </script>
+  </body>
+</html>
